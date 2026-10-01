@@ -7,19 +7,20 @@
 | Platform: Kmax SDKs, display framework, editor tooling | Done. Compiles clean in the Editor; never run on a Kmax display |
 | Content pipeline: DOSCH importer, topic data, validator | Done |
 | Six topics: heart, brain, ear, eye, breathing, skull and face | Done. Verified in the Editor |
-| Body map hub and kiosk shell | Done. The shell's timings are guesses |
+| Body map and kiosk shell | Done. The shell's timings are guesses |
+| Launcher (the hub), and the dark glass interface at half size, spring buttons, music, button sounds, four-colour beam | Done. Verified in the Editor; the half-size text and everything on the glass are unproven |
 | Two activities: Put the organs back, Pen as instrument | Done. Verified in the Editor with the mouse as the pen |
-| The user's review of the scenes and the two activities | Outstanding |
+| The user's review of the launcher, the scenes and the two activities | Outstanding |
 | Polish: post-processing, MSAA, backdrop | Not started |
 | Windows Standalone build | Not started |
 | Comfort audit of every topic | Not done: only ad hoc checks of depth |
 | Hardware verification and tuning | Not started: needs a Kmax display |
 | Clinical review of every text | Outstanding |
-| Source control | Nothing committed: the nested repo is on a detached HEAD at the initial commit |
+| Source control | On `main`. The user committed the exhibit before the launcher (`46327ec`); the launcher and the glass interface are uncommitted |
 
 ## What comes next
 
-1. **The user's review** of every scene and both activities (Editor, F1 to F9). What it asks to change comes before anything below.
+1. **The user's review** of the launcher, every scene and both activities (Editor, F1 to F10). What it asks to change comes before anything below.
 2. **Polish** (Phase 5), then a **Windows Standalone build** and a **comfort audit** of every topic (Phase 6). None of these needs hardware.
 3. **When a display is available:** Phase 1, then the tuning items under "Needs hardware" in [tasks.md](tasks.md).
 4. **Before public use:** clinical review of every text, a decision on languages, and the delivery form of the DOSCH models
@@ -71,15 +72,18 @@ the build.
    muscle shows its part of the cycle; twenty muscles and both rows of teeth.
 7. **Body map hub (done).** A glowing bust on the glass with five layers (skeleton, muscles, organs, vessels,
    nerves) and six places to explore; point at one, press Explore or press it again, and the screen fades into its
-   topic. It is also the kiosk's menu (see Phase 4).
+   topic. It was the kiosk's menu until the launcher (item 10); it is now one of the launcher's cards.
 8. **Put the organs back (done).** Ten organs thrown out in front of the glass; carry each home with the pen (`StylusGrab`), hear a
    chime and read its card; a hint, a fanfare and Play again. Opened from a button on the body map.
 9. **Pen as instrument (done).** The torso solid in layers, cut by a lens at the pen's tip or by a slice at its depth, by clipping and
    not by transparency; the caption names the organ the pen is in and how deep it is. Opened from a button on the body map.
 
+10. **The launcher (done).** Nine cards in a row of five over a row of four, with the chosen exhibit's own model turning in front of the
+   glass above them and a Load button below; the exhibit opens on it and returns to it. Menu and Next exhibit buttons lead to and round it.
+
 ## Phase 4 — Kiosk shell (built, to be tuned on hardware)
 
-- Done: the body map as the menu, fades, an idle return to the body map, and an attract mode (the body map's tour). A
+- Done: the launcher as the menu, fades, an idle return to the launcher, and an attract mode (the launcher choosing its own cards). A
   tracked pair of eyes counts as a visitor.
 - Still to do: tune the timings on site, prove that the head tracker's presence is dependable, and look for a state the
   loop cannot recover from.
@@ -87,10 +91,11 @@ the build.
 
 ## Phase 5 — Presentation (partly done)
 
-- Done: viewer-fixed lighting for a stereo display, a 3D URP renderer (checked), synthesised ambience and cues from
-  `ProceduralAudio` with override clips exposed.
-- Not started, the polish pass: a post-processing Volume through `StereoPostProcessing`, MSAA in the URP asset, a subtle
-  backdrop, emphasis and ghost strengths, and brighter cut faces in the scan.
+- Done: viewer-fixed lighting for a stereo display, a 3D URP renderer (checked), synthesised music, cues and button sounds from
+  `ProceduralAudio` with override clips exposed; the dark glass interface at half size; spring buttons; the four-colour beam.
+- Not started, the polish pass: a post-processing Volume through `StereoPostProcessing` (with bloom, after which the beam's HDR emission
+  limit, `StylusBeam.limitToDisplayRange`, can come off), MSAA in the URP asset, a subtle backdrop for the topics (the launcher has one),
+  emphasis and ghost strengths, and brighter cut faces in the scan.
 
 ## Phase 6 — Hardening (not started)
 

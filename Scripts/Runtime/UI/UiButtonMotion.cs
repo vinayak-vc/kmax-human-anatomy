@@ -5,28 +5,44 @@ using UnityEngine.UI;
 
 namespace ViitorCloud.KmaxDisplay {
     /// <summary>
-    /// Gives a UGUI button the same interaction feel the 3D badges have: it swells on hover,
-    /// compresses on press and springs back on release.
+    /// Gives a UGUI button the same interaction feel the 3D badges have: it swells on hover, compresses and sinks on press
+    /// and springs back on release.
     ///
     /// On a stereo display the buttons sit on a world-space canvas at a fixed depth, so there is no
     /// cursor shadow or hover highlight to tell the viewer the pointer has arrived. Scale is the
-    /// cue that survives being looked at with two eyes from an angle.
+    /// cue that survives being looked at with two eyes from an angle, and the small sink on a press moves the
+    /// button's two images apart a hair, which reads as a button going down.
+    ///
+    /// <para>Scale, lift and sink are each a damped spring (<see cref="UiSpring"/>), not an ease, so a button settles with a
+    /// slight overshoot instead of stopping dead.</para>
     /// </summary>
     [RequireComponent(typeof(RectTransform))]
     public class UiButtonMotion : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         IPointerDownHandler, IPointerUpHandler {
+        private const float MetresPerMillimetre = 0.001f;
+
         [Header("Scale")]
-        [SerializeField, Range(1f, 1.4f), Tooltip("Scale held while the pointer rests on the button.")]
-        private float hoverScale = 1.07f;
-        [SerializeField, Range(0.6f, 1f), Tooltip("Scale compressed to at the moment of the press.")]
-        private float pressScale = 0.93f;
-        [SerializeField, Tooltip("Seconds the scale takes to settle. Smaller is snappier.")]
-        private float scaleSmoothTime = 0.07f;
+        [SerializeField, Range(1f, 1.4f), Tooltip("Scale the spring pulls towards while the pointer rests on the button.")]
+        private float hoverScale = 1.04f;
+        [SerializeField, Range(0.6f, 1f), Tooltip("Scale the spring pulls towards while the button is pressed.")]
+        private float pressScale = 0.94f;
+
+        [Header("Spring")]
+        [SerializeField, Range(4f, 60f), Tooltip("Undamped angular frequency of the spring, in radians a second. " +
+            "Larger is stiffer and snappier.")]
+        private float springFrequency = 18f;
+        [SerializeField, Range(0.2f, 1.5f), Tooltip("Damping ratio. Below one the button overshoots a little and settles, which " +
+            "is the bounce; one or more settles without overshoot.")]
+        private float springDamping = 0.7f;
+
+        [Header("Depth")]
+        [SerializeField, Tooltip("How far the button sinks into the screen while pressed, in millimetres of the world. " +
+            "It is converted to canvas units through the scale of the canvas, so it is the same on any window size.")]
+        private float pressDepthMillimetres = 2f;
 
         [Header("Lift")]
-        [SerializeField, Tooltip("Canvas units the button rises while hovered. On a stereo panel a " +
-            "small rise reads as the control coming to meet the pointer.")]
-        private float hoverLift = 7f;
+        [SerializeField, Tooltip("Canvas units the button rises while hovered. Zero keeps the swell the only hover cue.")]
+        private float hoverLift;
 
         [Header("Tint")]
         [SerializeField, Tooltip("Graphic tinted on hover. Left empty, no tinting happens.")]
@@ -57,7 +73,7 @@ namespace ViitorCloud.KmaxDisplay {
         private RectTransform _rectTransform;
         private Selectable _selectable;
         private Vector3 _restScale = Vector3.one;
-        private Vector2 _restAnchoredPosition;
+        private Vector3 _restAnchoredPosition;
         private Color _restTint = Color.white;
 
         private float _hoverProgress;
@@ -67,6 +83,8 @@ namespace ViitorCloud.KmaxDisplay {
         private float _scaleVelocity;
         private float _currentLift;
         private float _liftVelocity;
+        private float _currentDepth;
+        private float _depthVelocity;
         private bool _isHovered;
         private bool _isPressed;
 
@@ -76,11 +94,19 @@ namespace ViitorCloud.KmaxDisplay {
         /// </summary>
         public event Action<bool> HoverChanged;
 
+        /// <summary>
+        /// Changes the colour the tinted graphic rests at, for a button whose resting look changes with its state, such as a
+        /// card that has been chosen. The graphic eases to it, and to the hover tint from it, as usual.
+        /// </summary>
+        public void SetRestTint(Color tint) {
+            _restTint = tint;
+        }
+
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
             _selectable = GetComponent<Selectable>();
             _restScale = _rectTransform.localScale;
-            _restAnchoredPosition = _rectTransform.anchoredPosition;
+            _restAnchoredPosition = _rectTransform.anchoredPosition3D;
 
             if (tintTarget != null) {
                 _restTint = tintTarget.color;
@@ -101,10 +127,12 @@ namespace ViitorCloud.KmaxDisplay {
             _scaleVelocity = 0f;
             _currentLift = 0f;
             _liftVelocity = 0f;
+            _currentDepth = 0f;
+            _depthVelocity = 0f;
 
             if (_rectTransform != null) {
                 _rectTransform.localScale = _restScale;
-                _rectTransform.anchoredPosition = _restAnchoredPosition;
+                _rectTransform.anchoredPosition3D = _restAnchoredPosition;
             }
 
             if (tintTarget != null) {
@@ -115,26 +143,30 @@ namespace ViitorCloud.KmaxDisplay {
         private void Update() {
             float dt = Time.unscaledDeltaTime;
             bool interactable = _selectable == null || _selectable.IsInteractable();
+            bool hovered = _isHovered && interactable;
+            bool pressed = _isPressed && interactable;
 
-            _hoverProgress = Mathf.MoveTowards(_hoverProgress, (_isHovered && interactable) ? 1f : 0f, dt * 9f);
-            _pressProgress = Mathf.MoveTowards(_pressProgress, (_isPressed && interactable) ? 1f : 0f, dt * 16f);
+            // The progress values only drive the tint and the lift; the spring is what shapes the scale and the sink.
+            _hoverProgress = Mathf.MoveTowards(_hoverProgress, hovered ? 1f : 0f, dt * 9f);
+            _pressProgress = Mathf.MoveTowards(_pressProgress, pressed ? 1f : 0f, dt * 16f);
 
-            float target = Mathf.Lerp(1f, hoverScale, _hoverProgress);
-            target *= Mathf.Lerp(1f, pressScale, _pressProgress);
-
+            float targetScale = pressed ? pressScale : (hovered ? hoverScale : 1f);
             if (idlePulse && interactable) {
                 // Only breathe while resting, so the pulse never fights the hover.
                 float rest = 1f - _hoverProgress;
-                target *= 1f + idlePulseAmplitude * rest * Mathf.Sin(Time.unscaledTime * idlePulseSpeed);
+                targetScale *= 1f + idlePulseAmplitude * rest * Mathf.Sin(Time.unscaledTime * idlePulseSpeed);
             }
 
-            _currentScale = Mathf.SmoothDamp(_currentScale, target, ref _scaleVelocity, scaleSmoothTime, Mathf.Infinity, dt);
+            UiSpring.Step(ref _currentScale, ref _scaleVelocity, targetScale, springFrequency, springDamping, dt);
             _rectTransform.localScale = _restScale * _currentScale;
 
             // The lift eases out under the press, so pressing pushes the button back down again.
             float targetLift = hoverLift * _hoverProgress * (1f - _pressProgress);
-            _currentLift = Mathf.SmoothDamp(_currentLift, targetLift, ref _liftVelocity, scaleSmoothTime, Mathf.Infinity, dt);
-            _rectTransform.anchoredPosition = _restAnchoredPosition + new Vector2(0f, _currentLift);
+            UiSpring.Step(ref _currentLift, ref _liftVelocity, targetLift, springFrequency, springDamping, dt);
+
+            float targetDepth = pressed ? PressDepthInCanvasUnits() : 0f;
+            UiSpring.Step(ref _currentDepth, ref _depthVelocity, targetDepth, springFrequency, springDamping, dt);
+            _rectTransform.anchoredPosition3D = _restAnchoredPosition + new Vector3(0f, _currentLift, _currentDepth);
 
             if (_flashProgress > 0f) {
                 _flashProgress = Mathf.MoveTowards(_flashProgress, 0f,
@@ -153,6 +185,20 @@ namespace ViitorCloud.KmaxDisplay {
                         Mathf.SmoothStep(0f, 1f, _flashProgress));
                 }
             }
+        }
+
+        /// <summary>
+        /// The press depth in the canvas's own units. A world-space canvas faces the viewer with its +Z running into the
+        /// screen, so a positive offset is a button going down.
+        /// </summary>
+        private float PressDepthInCanvasUnits() {
+            Transform parent = _rectTransform.parent;
+            float scale = parent != null ? parent.lossyScale.z : 1f;
+            if (scale <= Mathf.Epsilon) {
+                return 0f;
+            }
+
+            return pressDepthMillimetres * MetresPerMillimetre / scale;
         }
 
         public void OnPointerEnter(PointerEventData eventData) {

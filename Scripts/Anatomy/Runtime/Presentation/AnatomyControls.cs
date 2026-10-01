@@ -10,8 +10,8 @@ using UnityEngine.UI;
 namespace ViitorCloud.KmaxAnatomy {
     /// <summary>
     /// The on-screen buttons: start or stop the tour, step to the previous or next structure, zoom, reset, and, on the body
-    /// map, explore the picked organ. A Body map button leads back to the body map from every topic. It reports presses
-    /// and shows only what it is told; it decides nothing itself.
+    /// map, explore the picked organ. A navigation pill leads out of every topic: Menu goes back to the launcher and Next goes on
+    /// to the next exhibit. It reports presses and shows only what it is told; it decides nothing itself.
     ///
     /// <para>Each button sits in a slot that the layout group positions, and only the tour button's slot is ever
     /// hidden. The button itself is never moved by layout, because
@@ -24,9 +24,12 @@ namespace ViitorCloud.KmaxAnatomy {
         [SerializeField, Tooltip("Slot shown only while the picked structure opens a topic.")]
         private GameObject exploreSlot;
         [SerializeField] private Button exploreButton;
-        [SerializeField, Tooltip("Slot shown in every topic but the body map, which it leads back to.")]
+        [SerializeField, Tooltip("The navigation pill, shown in every topic: Menu and Next side by side.")]
         private GameObject homeSlot;
-        [SerializeField] private Button homeButton;
+        [SerializeField, Tooltip("The Menu half of the pill, which leads back to the launcher.")]
+        private Button homeButton;
+        [SerializeField, Tooltip("The Next half of the pill, which leads on to the next exhibit.")]
+        private Button nextExhibitButton;
         [SerializeField, Tooltip("Slot the layout positions; shown or hidden as a whole when the topic has no tour.")]
         private GameObject tourSlot;
         [SerializeField] private Button tourButton;
@@ -61,6 +64,7 @@ namespace ViitorCloud.KmaxAnatomy {
         public event Action<int> LinkRequested;
         public event Action ExploreRequested;
         public event Action HomeRequested;
+        public event Action NextExhibitRequested;
         public event Action TourToggled;
         public event Action ExplodeToggled;
         public event Action PreviousRequested;
@@ -80,6 +84,7 @@ namespace ViitorCloud.KmaxAnatomy {
 
             exploreButton.onClick.AddListener(OnExploreClicked);
             homeButton.onClick.AddListener(OnHomeClicked);
+            nextExhibitButton.onClick.AddListener(OnNextExhibitClicked);
             tourButton.onClick.AddListener(OnTourClicked);
             explodeButton.onClick.AddListener(OnExplodeClicked);
             previousButton.onClick.AddListener(OnPreviousClicked);
@@ -105,6 +110,7 @@ namespace ViitorCloud.KmaxAnatomy {
 
             exploreButton.onClick.RemoveListener(OnExploreClicked);
             homeButton.onClick.RemoveListener(OnHomeClicked);
+            nextExhibitButton.onClick.RemoveListener(OnNextExhibitClicked);
             tourButton.onClick.RemoveListener(OnTourClicked);
             explodeButton.onClick.RemoveListener(OnExplodeClicked);
             previousButton.onClick.RemoveListener(OnPreviousClicked);
@@ -148,7 +154,7 @@ namespace ViitorCloud.KmaxAnatomy {
             exploreSlot.SetActive(canExplore);
         }
 
-        /// <summary>The Body map button is there in every topic but the body map itself.</summary>
+        /// <summary>The navigation pill, Menu and Next, is there in every topic.</summary>
         public void ShowHome(bool visible) {
             homeSlot.SetActive(visible);
         }
@@ -191,7 +197,7 @@ namespace ViitorCloud.KmaxAnatomy {
             }
 
             return exploreSlot != null && exploreButton != null && homeSlot != null && homeButton != null
-                && tourSlot != null && tourButton != null && tourLabel != null && explodeSlot != null
+                && nextExhibitButton != null && tourSlot != null && tourButton != null && tourLabel != null && explodeSlot != null
                 && explodeButton != null && explodeLabel != null && previousButton != null
                 && nextButton != null && zoomOutButton != null && zoomOutLabel != null && zoomInButton != null
                 && zoomInLabel != null && zoomText != null && resetButton != null;
@@ -212,6 +218,12 @@ namespace ViitorCloud.KmaxAnatomy {
         private void OnHomeClicked() {
             if (HomeRequested != null) {
                 HomeRequested();
+            }
+        }
+
+        private void OnNextExhibitClicked() {
+            if (NextExhibitRequested != null) {
+                NextExhibitRequested();
             }
         }
 

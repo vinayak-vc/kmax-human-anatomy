@@ -12,9 +12,9 @@ using ViitorCloud.KmaxDisplay.Editor;
 namespace ViitorCloud.KmaxAnatomy.Editor {
     /// <summary>
     /// Builds <c>Scene/Main.unity</c>, the one persistent scene the kiosk runs in: the Kmax rig set for the
-    /// 27" display, the stylus and event system, viewer-fixed lighting, the interface, the topic
-    /// controller and the kiosk shell that runs it unattended. The scene never references a DOSCH-derived asset; the
-    /// controller loads a topic by name, and it opens on the body map.
+    /// 27" display with its stylus beam, the event system, viewer-fixed lighting, the interface with the launcher, the audio
+    /// director, the topic controller and the kiosk shell that runs it unattended. The scene never references a DOSCH-derived
+    /// asset; the controller and the launcher load a topic by name, and the exhibit opens on the launcher.
     ///
     /// <para>Like every builder here it converges on the spec: each step finds what exists and re-applies
     /// it, so running it twice, or after the scene has drifted, gives the same scene.</para>
@@ -23,10 +23,9 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
         private const string ScenePath = KmaxRigBuilder.ModuleRoot + "/Scene/Main.unity";
         private const string ExhibitName = "Exhibit";
         private const string ViewerName = "Viewer";
+        private const string AudioDirectorName = "AudioDirector";
+        private const string StylusTipMaterialPath = KmaxRigBuilder.ModuleRoot + "/Content/Materials/StylusTip.mat";
         private const string LogPrefix = "[Anatomy] ";
-
-        /// <summary>The topic the exhibit opens on and returns to: the body map.</summary>
-        private const string HubTopicId = "body";
 
         /// <summary>Distance from the eye to the model's centre. The eye is 0.5 m from the glass.</summary>
         private const float ViewerDistance = 0.47f;
@@ -49,8 +48,10 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             KmaxRigBuilder.ConfigureStereoCameras(rig, BackgroundColor);
             KmaxRigBuilder.EnsureEventSystem();
             StylusTip tip = KmaxRigBuilder.EnsureTip(rig, 0.004f, true);
+            KmaxRigBuilder.EnsureBeam(rig, StylusTipMaterialPath);
             KmaxRigBuilder.EnsureDiagnostics(tip);
             EnsureLighting(rig);
+            EnsureAudioDirector();
 
             Camera eventCamera = rig.GetComponentInChildren<Camera>(true);
             AnatomyInterfaceParts parts = AnatomyInterfaceBuilder.Build(eventCamera, ReadWindowSize(rig));
@@ -58,6 +59,8 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             AnatomyTopicController controller = EnsureExhibit();
             ViewerFlyController viewer = EnsureViewer(rig, controller);
             WireExhibit(controller, viewer, parts, tip);
+            Transform modelParent = controller.transform.Find("Model");
+            AnatomyLauncherBuilder.BuildStage(parts.Launcher, modelParent, viewer, controller.GetComponent<AnatomyAudio>());
             WireShell(controller, parts, tip, rig);
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -139,6 +142,17 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             host.transform.localRotation = rotation;
         }
 
+        /// <summary>
+        /// The director of the music and of the buttons' sounds, at the scene's root so it can outlast the scene. With a copy
+        /// already in the scene it is found and left as it is.
+        /// </summary>
+        private static void EnsureAudioDirector() {
+            GameObject host = KmaxRigBuilder.FindOrCreateRoot(AudioDirectorName);
+            if (host.GetComponent<PersistentAudioDirector>() == null) {
+                host.AddComponent<PersistentAudioDirector>();
+            }
+        }
+
         private static AnatomyTopicController EnsureExhibit() {
             GameObject host = KmaxRigBuilder.FindOrCreateRoot(ExhibitName);
             host.transform.position = Vector3.zero;
@@ -203,11 +217,16 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             return viewer;
         }
 
-        /// <summary>Gives the shell what it runs: the controller, the buttons, the fader, and, if the rig has them, the pen and the head tracker.</summary>
+        /// <summary>
+        /// Gives the shell what it runs: the controller, the buttons, the launcher, the topic's interface, the fader, and, if the
+        /// rig has them, the pen and the head tracker.
+        /// </summary>
         private static void WireShell(AnatomyTopicController controller, AnatomyInterfaceParts parts, StylusTip tip, GameObject rig) {
             SerializedObject shellObject = new SerializedObject(controller.GetComponent<KioskShell>());
             KmaxRigBuilder.SetReference(shellObject, "controller", controller);
             KmaxRigBuilder.SetReference(shellObject, "controls", parts.Controls);
+            KmaxRigBuilder.SetReference(shellObject, "launcher", parts.Launcher);
+            KmaxRigBuilder.SetReference(shellObject, "topicInterface", parts.TopicInterface);
             KmaxRigBuilder.SetReference(shellObject, "fader", parts.Fader);
             KmaxRigBuilder.SetReference(shellObject, "stylusTip", tip);
             KmaxRigBuilder.SetReference(shellObject, "headTracker", rig.GetComponentInChildren<HeadTracker>(true));
@@ -228,8 +247,8 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             KmaxRigBuilder.SetReference(controllerObject, "depthKeeper", controller.transform.Find("Model").GetComponent<ComfortDepthKeeper>());
             KmaxRigBuilder.SetReference(controllerObject, "layerPanel", parts.Layers);
             KmaxRigBuilder.SetReference(controllerObject, "stylusTip", tip);
-            KmaxRigBuilder.SetString(controllerObject, "hubTopicId", HubTopicId);
-            KmaxRigBuilder.SetString(controllerObject, "startTopicId", HubTopicId);
+            // The exhibit opens on the launcher, which is not a topic, so no topic is loaded to start with.
+            KmaxRigBuilder.SetString(controllerObject, "startTopicId", string.Empty);
             controllerObject.ApplyModifiedPropertiesWithoutUndo();
 
             SerializedObject zoomObject = new SerializedObject(controller.GetComponent<AnatomyZoom>());

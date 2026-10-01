@@ -2,13 +2,17 @@
 
 using UnityEngine;
 
+using ViitorCloud.KmaxDisplay.Editor;
+
 namespace ViitorCloud.KmaxAnatomy.Editor {
     /// <summary>
     /// Cross-checks every topic's text against its imported model, so a renamed structure or a typo in an id
-    /// is reported here and not discovered as a silently blank caption in front of a visitor.
+    /// is reported here and not discovered as a silently blank caption in front of a visitor. It also checks the launcher's cards
+    /// against the topics they open, and that every surface of the models is drawn on both sides.
     /// </summary>
     public static class AnatomyTopicValidator {
         private const string LogPrefix = "[Anatomy] ";
+        private const string GlowShaderName = "Kmax Anatomy/Glow";
 
         [MenuItem("Kmax/Anatomy/Validate Topic Data")]
         public static void ValidateAll() {
@@ -21,12 +25,97 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             problems += Validate(AnatomyBodyImporter.ModelId);
             problems += Validate(AnatomyTorsoImporter.OrgansModelId);
             problems += Validate(AnatomyTorsoImporter.ScanModelId);
+            problems += ValidateLauncher();
+            problems += CountSingleSidedMaterials(false);
 
             if (problems == 0) {
                 Debug.Log($"{LogPrefix}Topic data is consistent with the models.");
             } else {
                 Debug.LogWarning($"{LogPrefix}{problems} problem(s) found in topic data.");
             }
+        }
+
+        /// <summary>
+        /// Makes every material of the models, and of the interface's own, draw both sides: a cut-away or an open shell seen from
+        /// inside would otherwise show nothing. The importers already write them that way; this puts right anything that was
+        /// edited by hand. The additive glow layers cull their back faces on purpose, because stacked additive layers would
+        /// otherwise brighten wherever a back face lies behind a front one, so they are left alone.
+        /// </summary>
+        [MenuItem("Kmax/Anatomy/Enforce Double-Sided Materials")]
+        public static void EnforceDoubleSided() {
+            int fixedCount = CountSingleSidedMaterials(true);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"{LogPrefix}{fixedCount} material(s) were drawn on one side only and now draw both.");
+        }
+
+        /// <summary>
+        /// Counts the materials that cull a side, and puts them right when asked to. The Section shader culls nothing, in its source,
+        /// and the glow layers are the one exception, so what is left is the URP materials with a cull mode other than off.
+        /// </summary>
+        private static int CountSingleSidedMaterials(bool fix) {
+            string[] guids = AssetDatabase.FindAssets("t:Material", new string[] { AnatomyPaths.GeneratedRoot, KmaxRigBuilder.ModuleRoot + "/Content" });
+            int found = 0;
+            for (int i = 0; i < guids.Length; i++) {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (material == null || material.shader == null || material.shader.name == GlowShaderName || !material.HasProperty("_Cull")) {
+                    continue;
+                }
+
+                if (!Mathf.Approximately(material.GetFloat("_Cull"), 0f)) {
+                    found++;
+                    if (fix) {
+                        material.SetFloat("_Cull", 0f);
+                        EditorUtility.SetDirty(material);
+                    } else {
+                        Debug.LogWarning($"{LogPrefix}'{path}' culls one side of its surface. Run Kmax > Anatomy > Enforce Double-Sided Materials.");
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        /// <summary>Checks that every card opens a topic that exists, that no topic is offered twice, and that the cards fit the pool.</summary>
+        private static int ValidateLauncher() {
+            AnatomyLauncherData data = AnatomyTopicLibrary.LoadLauncher();
+            if (data == null) {
+                return 1;
+            }
+
+            int problems = 0;
+            if (data.Entries.Count > AnatomyLauncherBuilder.CardCount) {
+                Debug.LogError($"{LogPrefix}The launcher lists {data.Entries.Count} exhibits but the interface has only " +
+                    $"{AnatomyLauncherBuilder.CardCount} cards. Rebuild the scene with a larger pool.");
+                problems++;
+            }
+
+            for (int i = 0; i < data.Entries.Count; i++) {
+                AnatomyLauncherEntry entry = data.Entries[i];
+                if (string.IsNullOrEmpty(entry.Label)) {
+                    Debug.LogError($"{LogPrefix}Launcher card {i + 1} has no name.");
+                    problems++;
+                }
+
+                if (Resources.Load<TextAsset>("Topics/" + entry.Topic) == null) {
+                    Debug.LogError($"{LogPrefix}Launcher card '{entry.Label}' opens topic '{entry.Topic}', which has no data.");
+                    problems++;
+                }
+
+                for (int other = 0; other < i; other++) {
+                    if (data.Entries[other].Topic == entry.Topic) {
+                        Debug.LogError($"{LogPrefix}The launcher offers topic '{entry.Topic}' twice.");
+                        problems++;
+                    }
+                }
+
+                if (AnatomyTopicLibrary.LoadThumbnail(entry.Topic) == null) {
+                    Debug.LogWarning($"{LogPrefix}Launcher card '{entry.Label}' has no picture. Run Kmax > Anatomy > Build > Launcher Thumbnails.");
+                    problems++;
+                }
+            }
+
+            return problems;
         }
 
         private static int Validate(string topicId) {

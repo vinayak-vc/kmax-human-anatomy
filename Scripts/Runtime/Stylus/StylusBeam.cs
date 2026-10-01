@@ -8,8 +8,11 @@ namespace ViitorCloud.KmaxDisplay {
     ///
     /// This replaces the SDK's <c>StylusRay</c> rather than extending it, because the exhibit needs
     /// three things that one does not do: the tip is oriented to the surface normal so it reads as
-    /// touching the anatomy rather than floating inside it, the beam recolours on hit so the viewer
-    /// knows when a press will land, and hits drive haptics.
+    /// touching the anatomy rather than floating inside it, the beam shows what the pen is doing, and hits drive haptics.
+    ///
+    /// <para>The beam is one of four colours, a <see cref="StylusBeamState"/>: cyan while the pen scans, green while the
+    /// select button is down on something that can be selected, amber while the reset button is down, and violet while the
+    /// function button is down.</para>
     ///
     /// <see cref="KmaxStylus"/> finds this through <c>GetComponent&lt;IPointerVisualize&gt;()</c> on
     /// its serialised <c>stylus</c> transform, so this component must sit on that same object.
@@ -40,13 +43,35 @@ namespace ViitorCloud.KmaxDisplay {
         [SerializeField, Tooltip("Align the tip to the surface it lands on. Off keeps it aimed along the beam.")]
         private bool alignTipToSurface = true;
 
+        [Header("States")]
+        [SerializeField, Range(0, 2), Tooltip("The pen button that resets or goes back, which shows amber. Match the reset button " +
+            "of StylusNavigation. The select button is the pointer's primary key; the third button shows violet.")]
+        private int secondaryButton = 1;
+
         [Header("Colours")]
-        [SerializeField, Tooltip("Beam colour while the ray is hitting nothing.")]
-        private Color idleColor = new Color(0.45f, 0.72f, 0.95f, 0.30f);
-        [SerializeField, Tooltip("Beam colour while the ray rests on something interactive.")]
-        private Color hitColor = new Color(0.55f, 0.90f, 1f, 0.85f);
-        [SerializeField, Tooltip("Beam colour while a stylus button is held down.")]
-        private Color pressColor = new Color(1f, 0.82f, 0.35f, 1f);
+        [SerializeField, Tooltip("Calm: the pen is scanning with no button down. Electric cyan, #06B6D4.")]
+        private Color calmColor = new Color(0.024f, 0.714f, 0.831f, 1f);
+        [SerializeField, Tooltip("HDR emission multiplier for the calm colour.")]
+        private float calmEmission = 1.5f;
+        [SerializeField, Tooltip("Select: the select button is down on something that can be selected. Emerald, #10B981.")]
+        private Color selectColor = new Color(0.063f, 0.725f, 0.506f, 1f);
+        [SerializeField, Tooltip("HDR emission multiplier for the select colour.")]
+        private float selectEmission = 2.2f;
+        [SerializeField, Tooltip("Secondary: the reset or back button is down. Amber, #F59E0B.")]
+        private Color secondaryColor = new Color(0.961f, 0.620f, 0.043f, 1f);
+        [SerializeField, Tooltip("HDR emission multiplier for the secondary colour.")]
+        private float secondaryEmission = 1.8f;
+        [SerializeField, Tooltip("Tertiary: the function button is down, or select is held over nothing as the zoom gesture. Violet, #A855F7.")]
+        private Color tertiaryColor = new Color(0.659f, 0.333f, 0.969f, 1f);
+        [SerializeField, Tooltip("HDR emission multiplier for the tertiary colour.")]
+        private float tertiaryEmission = 1.8f;
+        [SerializeField, Range(0f, 1f), Tooltip("Opacity of the calm beam while the ray is hitting nothing. A held button is always opaque.")]
+        private float restingAlpha = 0.4f;
+        [SerializeField, Range(0f, 1f), Tooltip("Opacity of the calm beam while the ray rests on something, so the viewer knows a press would land.")]
+        private float targetAlpha = 0.9f;
+        [SerializeField, Tooltip("Stop the emission multipliers where the brightest channel reaches one. The cameras have no bloom, " +
+            "so an emission above one would clamp each channel on its own and turn the green beam cyan. Switch it off once they do.")]
+        private bool limitToDisplayRange = true;
         [SerializeField, Tooltip("Seconds the colour takes to cross-fade between states.")]
         private float colorBlendTime = 0.09f;
 
@@ -79,6 +104,9 @@ namespace ViitorCloud.KmaxDisplay {
             get { return _stylus != null && _stylus.CurrentHitObject != null; }
         }
 
+        /// <summary>What the pen is doing, as the beam last showed it.</summary>
+        public StylusBeamState State { get; private set; }
+
         public void InitVisualization(KmaxPointer pointer) {
             _stylus = pointer as KmaxStylus;
             _propertyBlock = new MaterialPropertyBlock();
@@ -103,7 +131,8 @@ namespace ViitorCloud.KmaxDisplay {
             }
 
             _originalRayLength = _stylus != null ? _stylus.RayLength : 1f;
-            _currentColor = idleColor;
+            State = StylusBeamState.Calm;
+            _currentColor = ColorFor(State, false);
             ApplyColor(_currentColor);
             ApplyTipScale(1f);
         }
@@ -118,11 +147,10 @@ namespace ViitorCloud.KmaxDisplay {
 
             GameObject hit = _stylus.CurrentHitObject;
             bool isHitting = hit != null;
-            bool isPressed = _stylus.AnyButtonPressed;
 
             UpdateBeam();
             UpdateTip(isHitting);
-            UpdateColor(isHitting, isPressed);
+            UpdateColor(isHitting);
             UpdateHaptics(hit);
         }
 
@@ -186,17 +214,52 @@ namespace ViitorCloud.KmaxDisplay {
             tip.localScale = Vector3.one * (tipSize * _viewScale * multiplier);
         }
 
-        private void UpdateColor(bool isHitting, bool isPressed) {
-            Color target = idleColor;
-            if (isPressed) {
-                target = pressColor;
-            } else if (isHitting) {
-                target = hitColor;
-            }
+        /// <summary>
+        /// Works out which of the four states the pen is in from its buttons and what the ray rests on, and eases the beam to
+        /// that state's colour. The select button is the pointer's primary key; the secondary button is the one that resets; the
+        /// tertiary is the third.
+        /// </summary>
+        private void UpdateColor(bool isHitting) {
+            int selectButton = (int)_stylus.PrimaryKey;
+            int tertiaryButton = StylusBeamStates.TertiaryIndex(selectButton, secondaryButton);
+            State = StylusBeamStates.Resolve(
+                _stylus.GetButton(selectButton),
+                selectButton != secondaryButton && _stylus.GetButton(secondaryButton),
+                _stylus.GetButton(tertiaryButton),
+                isHitting);
 
+            Color target = ColorFor(State, isHitting);
             float step = colorBlendTime > 0f ? Time.deltaTime / colorBlendTime : 1f;
             _currentColor = Color.Lerp(_currentColor, target, Mathf.Clamp01(step));
             ApplyColor(_currentColor);
+        }
+
+        /// <summary>The beam's colour for a state: its hue at its emission, and for the calm state, more opaque on a target.</summary>
+        private Color ColorFor(StylusBeamState state, bool isHitting) {
+            Color colour;
+            float emission;
+            switch (state) {
+                case StylusBeamState.Select:
+                    colour = selectColor;
+                    emission = selectEmission;
+                    break;
+                case StylusBeamState.Secondary:
+                    colour = secondaryColor;
+                    emission = secondaryEmission;
+                    break;
+                case StylusBeamState.Tertiary:
+                    colour = tertiaryColor;
+                    emission = tertiaryEmission;
+                    break;
+                default:
+                    colour = calmColor;
+                    emission = calmEmission;
+                    break;
+            }
+
+            Color lit = StylusBeamStates.ApplyEmission(colour, emission, limitToDisplayRange);
+            lit.a = state == StylusBeamState.Calm ? (isHitting ? targetAlpha : restingAlpha) : 1f;
+            return lit;
         }
 
         private void ApplyColor(Color color) {

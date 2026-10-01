@@ -3,11 +3,13 @@
 A human anatomy exhibit for the **Kmax** head-tracked stereo display with a 6-DOF stylus.
 
 The module holds the Kmax SDKs, a domain-neutral display framework ported from `kmax-display-example`, and the
-exhibit built on it. `Scene/Main.unity` opens on a **body map**: a glowing bust with layers to show and hide and six places to explore, the
-**heart**, **brain**, **ear**, **eye**, **breathing** and **skull and face**. Each opens behind a fade and leads back with a Body
-map button. Left alone, a topic returns to the body map and the body map shows itself. Two buttons on the body map open the
-activities: **put the organs back** (carry each organ home with the pen) and **scan the body** (the pen's tip cuts into the torso).
-In the Editor, F1 to F9 switch between the topics, the body map and the activities.
+exhibit built on it. `Scene/Main.unity` opens on a **launcher**: nine cards (the body map, the **heart**, **brain**, **ear**, **eye**,
+**breathing**, **skull and face** and the two activities) with the chosen exhibit's own model turning in front of the glass above them.
+Pressing a card chooses it; pressing it again, or Load, opens it behind a fade, and a Menu button leads back (Next exhibit goes on round).
+Left alone, a topic returns to the launcher and the launcher shows itself, card by card. The **body map** is a glowing bust with layers to
+show and hide and six places to explore. The activities are **put the organs back** (carry each organ home with the pen) and **scan the
+body** (the pen's tip cuts into the torso). The whole interface is dark glass at half size, with spring buttons, music and button sounds.
+In the Editor, F1 to F9 switch between the topics, the body map and the activities, and F10 goes to the launcher.
 
 ## Layout
 
@@ -30,8 +32,8 @@ docs/               how to use it, and why it is shaped this way
 3. Read **[docs/kmax-usage-guide.md](docs/kmax-usage-guide.md)** before writing scene code.
 4. Build a scene from `KmaxRigBuilder` rather than authoring one by hand.
 5. Run **Kmax → Audit Comfort Volume** after every scene change.
-6. Place the DOSCH pack in `Source~/` and run **Kmax → Anatomy → Import → All Topics**. Models are never
-   committed; a fresh clone has none until this is done.
+6. Place the DOSCH pack in `Source~/` and run **Kmax → Anatomy → Import → All Topics**, which also renders the launcher's card pictures.
+   Models and pictures are never committed; a fresh clone has none until this is done. Then **Kmax → Anatomy → Build → Kiosk Scene**.
 
 ## The three things that matter most
 

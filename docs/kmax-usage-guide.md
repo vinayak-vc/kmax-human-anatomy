@@ -158,8 +158,20 @@ object can be pushed off the hand by something solid — which is correct, and r
 
 Treats the pen as a **3D mouse**. Use it for UI, for distant objects, and for navigation.
 
-`StylusBeam` implements the SDK's `IPointerVisualize` and replaces `StylusRay`; it colours the beam
-by what the ray hit.
+`StylusBeam` implements the SDK's `IPointerVisualize` and replaces `StylusRay`; it shows what the pen is doing in one of four colours.
+The pen ships with `StylusRay`, and the stylus takes the first pointer visual on its object, so a scene must swap it:
+`KmaxRigBuilder.EnsureBeam(rig, tipMaterialPath)` does, and gives the beam a bead for a tip.
+
+| State | Colour | When |
+|---|---|---|
+| Calm | cyan `#06B6D4` | no button down (brighter on a target) |
+| Select | emerald `#10B981` | the select button (`KmaxStylus.PrimaryKey`) is down on something selectable |
+| Secondary | amber `#F59E0B` | the reset button (`secondaryButton`, 1 by default, matching `StylusNavigation.resetButton`) is down |
+| Tertiary | violet `#A855F7` | the third button is down, or select is held over nothing (the zoom gesture) |
+
+The HDR emission multipliers (1.5, 2.2, 1.8, 1.8) are fields, but they stop where the brightest channel reaches one
+(`limitToDisplayRange`): a display without bloom clamps each channel separately, so an emission of 2.2 on emerald would clamp to cyan.
+Turn the limit off when the cameras have bloom.
 
 `StylusNavigation` maps the pen's three buttons onto `ViewerFlyController`:
 
@@ -241,8 +253,13 @@ A pen press that lands on the UI does not start the gesture.
 - **`UiAlwaysOnTop`** forces a UI subtree to render over the scene. Necessary because a world-space
   canvas at the wrong depth gets buried in geometry or, worse, intersects it — an interpenetrating
   UI panel is one of the least fusible things you can put on this display.
-- **`UiButtonMotion`** adds press and hover motion. On a stereo display a button that only changes
-  colour reads as flat; a button that moves reads as a button.
+- **`UiButtonMotion`** adds press and hover motion on a damped spring (`UiSpring`): hover swells to 1.04, a press compresses to 0.94 and
+  sinks 2 mm into the screen, angular frequency 18, damping 0.7. On a stereo display a button that only changes
+  colour reads as flat; a button that moves reads as a button. **`UiButtonSound`**, on the same object, ticks on hover and drops on press
+  through the `PersistentAudioDirector`.
+- **Give the canvas a high sorting order (the builder uses 100).** The pen's ray meets a UI button and a model's collider in the same
+  query, and the SDK sorts the hits by canvas sorting order before distance; at 0 a collider floating in front of a button wins and the
+  button cannot be pressed.
 - **World-space canvases, placed with `StereoVolume`.** The SDK's `UIScaler` sizes them for the
   display.
 
@@ -274,7 +291,12 @@ and calling `BaseShaderGUI.SetupMaterialBlendMode`, never by setting the blend f
 
 `ProceduralAudio` synthesises pads, chimes, blips, whooshes, thuds and engine tones at runtime, so
 the module ships with no audio assets and no licence question attached to them. Loops are
-frequency-snapped so they wrap without a discontinuity.
+frequency-snapped so they wrap without a discontinuity. It also makes the interface's own sounds (a 15 ms hover tick, a 35 ms two-tone
+click, rising and falling 120 ms frequency-modulated sweeps, a soft E5 and B5 bell) and a seamless ambient music bed (an A drone, a pad
+through four chords of the A minor pentatonic scale, a sparse echoing melody, 66 beats a minute).
+
+`PersistentAudioDirector` plays the music and the buttons' sounds and survives scene loads (`DontDestroyOnLoad`, with a guard that
+removes a second copy). Put one in the scene's root; with none, the music and the button sounds are silent and nothing else changes.
 
 Expose an override `AudioClip` for every sound in your director component, so swapping in recorded
 audio later is an inspector edit and not a code change.
@@ -377,6 +399,21 @@ audio later is an inspector edit and not a code change.
 - **Reveal by clipping, not by transparency.** Discard in the fragment shader and draw the back faces of the cut as a flat colour. An
   alpha-blended layer in front of a solid sorts wrongly and fuses badly. A cap written with `SV_Depth` is wrong for hollow sheets
   without a stencil.
+- **A row of buttons must not force its height to expand.** A `HorizontalLayoutGroup` with `childForceExpandHeight` on reports itself as
+  flexible in height, and the `VerticalLayoutGroup` round it gives it any room to spare: the navigation pill swelled to four buttons
+  high on a topic that shows only two. Each button is already as tall as its row without it.
+- **`ComfortDepthKeeper.Track` measures every mesh again** (26 directions over every vertex: 50 to 140 ms for these models, and megabytes of
+  garbage). Call it when content is replaced, not on every swap of something that is already known to fit. The launcher's previews are fitted
+  by arithmetic (`LauncherFit`) and do not use it.
+- **The first `Resources.Load` of a heavy model is the slow part, not instantiating it.** Reading a model from disk took 115 to 600 ms and
+  instantiating it about 1 ms. Load ahead with `Resources.LoadAsync` while something else is on screen.
+- **Fit a model that turns by its horizontal reach.** Turned about a vertical axis it sweeps a circle of its widest radius into depth, so
+  its room in front of and behind its middle is that radius (plus what a lean adds), not its width. Measure the vertices, not a box round
+  them: a box round a branching or tilted part has corners far beyond the surface.
+- **A scripted press does not count as a visitor,** so the kiosk's idle clock runs while a test drives it with `Button.onClick.Invoke()`, and
+  after 45 seconds the launcher starts changing its own selection under the test. Do the press and the second press in one call.
+- **`execute_code` runs a method body compiled as C# 6,** so it has no local functions and cannot declare a method after its `return`. Write
+  `UnityEngine.Object`, use delegates for callbacks, and keep their state in captured arrays.
 
 ## 10. Checklist for a new scene
 

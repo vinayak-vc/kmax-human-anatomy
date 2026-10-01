@@ -55,6 +55,20 @@ namespace ViitorCloud.KmaxAnatomy {
             get { return _state; }
         }
 
+        /// <summary>
+        /// Adds a highlight to a structure and gives it the resting look its topic's text asks for: how solid it rests, and how
+        /// quietly it recedes. <paramref name="info"/> may be null for a structure the topic says nothing about.
+        /// </summary>
+        public static StructureHighlight Attach(AnatomyStructure structure, AnatomyStructureInfo info) {
+            StructureHighlight highlight = structure.gameObject.AddComponent<StructureHighlight>();
+            if (info != null) {
+                highlight.SetRestOpacity(info.RestOpacity);
+                highlight.SetRecededLook(info.RecededSolidity, info.RecededGlow);
+            }
+
+            return highlight;
+        }
+
         private void Awake() {
             AnatomyStructure structure = GetComponent<AnatomyStructure>();
             _renderer = structure.StructureRenderer;

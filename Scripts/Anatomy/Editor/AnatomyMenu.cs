@@ -50,6 +50,11 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             AnatomyTorsoImporter.ImportScan();
         }
 
+        [MenuItem("Kmax/Anatomy/Build/Launcher Thumbnails")]
+        private static void BuildLauncherThumbnails() {
+            AnatomyLauncherThumbnails.RenderAll();
+        }
+
         [MenuItem(ImportRoot + "All Topics")]
         private static void ImportAllTopics() {
             AnatomyImportSpec[] specs = AnatomyTopicSources.All();
@@ -68,6 +73,9 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             } finally {
                 EditorUtility.ClearProgressBar();
             }
+
+            // The pictures on the launcher's cards are of the models just made.
+            AnatomyLauncherThumbnails.RenderAll();
         }
     }
 }

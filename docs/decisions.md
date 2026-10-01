@@ -4,6 +4,90 @@ Newest first. Each entry records what was decided and why, so it does not have t
 
 ---
 
+## 2026-10-01 — A launcher is the hub, and the whole interface is dark glass at half size
+
+**Decision.** The exhibit opens on, and returns to, a **launcher**: nine cards (the body map, heart, brain, ear, eye, breathing, skull
+and face, and the two activities) in a row of five over a row of four, with the chosen exhibit's own model turning in front of the
+glass above them and a Load button below. The model is the topic's real model, on a turntable that leans a little towards the viewer,
+30 mm in front of the glass; choosing another card lets the old one shrink away while the new one springs up. Pressing a card chooses it;
+pressing the chosen card again, or Load, opens it. This was built to match the user's reference recording of the launcher in the sibling
+`kmax-display-example` project (a letter-spaced "SELECT AN EXHIBIT", the chosen exhibit named in cyan under it, a cyan bar on the chosen
+card, a pill Load button, drifting dust on a slate backdrop).
+- *The launcher is a screen, not a topic, and it lives in `Main.unity`.* The user chose the one scene (the same answer as the earlier
+  decision, so fades and the idle return keep working). `KioskShell` owns it: it shows the launcher at start and on the idle return, hides
+  it behind the fade when a topic is asked for, and switches the topic's whole interface off while it is up (everything of a topic's lives
+  in one container, `TopicInterface`). `AnatomyTopicController` can now start with no topic (`startTopicId` empty) and clear its topic
+  (`ClearTopic`); it no longer has a hub topic (`hubTopicId`, `IsOnHub` and the body map's tour as the attract mode are gone). The body
+  map is one more card, and still leads to its six places and, by its two links, to the activities.
+- *Menu and Next exhibit.* A topic's top-right corner holds a pill: Menu goes to the launcher and Next exhibit steps to the next card's
+  topic, and after the last it goes to the launcher, so pressing it round and round visits everything once. Next exhibit is worded so it
+  is not mistaken for the Next that steps through a topic's structures.
+- *Attract mode is the launcher choosing its own cards,* one every `attractStepSeconds` (7), silently, after 45 seconds of nobody there.
+  Any visitor activity ends it, and the exhibit then on show stays chosen.
+- *Cards read from data.* `Content/Resources/Launcher/launcher.json` lists the cards (topic and name), their order, the heading and the
+  Load wording; each card's subtitle line is its topic's own subtitle. The pool is nine cards, built with the scene, and the validator
+  reports a list that does not fit it.
+- *The previews are the real models, fitted by arithmetic.* `LauncherFit` scales each so that, however far round it has turned, it
+  stays inside the depth budget and between the title and the cards, from the true outline of its meshes (every vertex, not a box).
+  Measured over a whole turn for all nine: nearest -71 to -108 mm against a limit of -115, farthest under +50 mm, and between 0.42 and
+  0.83 of the screen's height. Because that holds by construction, **the depth keeper is not used in the launcher**: it measures every
+  mesh again on each swap, 50 to 140 ms. A preview has no colliders, rests as its topic does (the lungs as glass) and, for the heart,
+  the breathing chest, the ear's sound and the body map's organs, runs its own motion silently. The eye and the jaw are left still, because
+  their behaviours work on soft colliders.
+- *Models are read ahead.* The first load of a heavy model from disk took 115 to 600 ms. While the launcher is up it reads every model
+  in the background (`Resources.LoadAsync`), after which making a preview takes 3 to 44 ms. A card chosen before its model has arrived just
+  loads it then. Previews are destroyed when the launcher goes down; the assets stay.
+- *The pictures on the cards are rendered from the models* (`AnatomyLauncherThumbnails`, a three-quarter view lit like the exhibit, glass
+  where the topic rests as glass) into `Generated/Resources/Anatomy/Thumbs`. Like the models they are made from the DOSCH pack, so they are
+  ignored by git and absent on a fresh clone, where a card shows its name alone. **Kmax → Anatomy → Build → Launcher Thumbnails** makes
+  them, and **Import → All Topics** does it last.
+
+**The look.** The user supplied a house style for the whole suite, applied here to every screen: a dark slate glass panel (`#0F172A` at
+82%) with a one-unit `#334155` outline, neon cyan (`#06B6D4`, and `#22D3EE` for text) for what is chosen or lit, white headings,
+`#E2E8F0` body text, and the whole interface at **half the size it was first built at**. `AnatomyUiStyle` holds the palette and
+the scale (`Scale = 0.5`) in one place and every builder multiplies by it, so one number rebuilds the interface at another size. The
+panels are a generated nine-sliced rounded rectangle and its outline (`AnatomyGlassSprites`).
+- *Where it departs from the style's wording, and why.* The style puts navigation at the top left and the information panel at the top
+  right. This exhibit keeps its title at the top left, its buttons in one column at the top right (the pill first), the layer buttons at
+  the left and the caption as a short card low in the middle, because the model sits in the middle of the screen and the badges stand
+  in two columns either side of it. Moving them would have meant re-measuring the badge columns and the puzzle's clear areas for no gain
+  the user asked for. The style's serialized-field spelling (`_name`) was not used: AGENTS.md, which outranks it, wants `camelCase`.
+- *The badges' hit areas are larger than their pictures* (56 canvas units against 32), so halving the interface does not halve how
+  easy a numbered badge is to point at.
+- *The canvas has sorting order 100*, so the pen's ray meets a button before it meets the collider of a model that happens to float in
+  front of it. The SDK sorts the two kinds of hit by canvas sorting order first. Checked with a collider 60 mm in front of a card: the card
+  is hit at 100 and the collider at 0.
+
+**Motion, sound and the pen.**
+- *Buttons are springs* (`UiSpring`, `UiButtonMotion`): hover swells to 1.04, a press compresses to 0.94 and sinks 2 mm into the screen, and
+  all of it moves on a damped harmonic oscillator, angular frequency 18, damping 0.7, solved in closed form so any frame time is exact.
+  Checked: 4.6% overshoot, settled in 0.38 s. The old hover lift is off by default. A card's resting colour changes with its state, so the
+  motion takes `SetRestTint` and does not fight the card.
+- *The audio director* (`PersistentAudioDirector`) is a singleton that outlasts a scene load and thins duplicates to one. It plays a
+  seamless music bed (`ProceduralAudio.CreateAmbientMusic`: an A drone, a pad moving through four chords of the A minor pentatonic scale
+  and a sparse echoing melody, 66 beats a minute, 29.09 s, made in 0.4 s, loop seam 0.003 against a normal step of 0.063) and the sounds
+  of every button, through `UiButtonSound` on the button itself: a 15 ms tick on hover and a 35 ms two-tone drop on press, the press
+  varied by +/-5% each time. `AnatomyAudio` keeps the content's cues and lost its own pad. Its cue sounds became the style's: a soft E5 and
+  B5 bell for choosing a structure, a 120 ms rising frequency-modulated sweep (280 to 720 Hz) for pulling a topic apart and a falling one
+  for putting it back and for Reset.
+- *The beam is one of four colours* (`StylusBeam`, with the rules in `StylusBeamStates`): cyan while the pen scans, emerald while the
+  select button (the pointer's primary key, which ships as the centre button) is down on something that can be selected, amber
+  while the reset button is down, violet while the other button is down or while select is held over nothing, which is the zoom gesture.
+  It was never attached: the pen still drew the SDK's own `StylusRay`. `KmaxRigBuilder.EnsureBeam` now swaps it in, with a small bead for a tip.
+  The HDR emission figures (1.5, 2.2, 1.8, 1.8) are kept as fields but **limited to the display range**: the cameras have no bloom, and
+  multiplying emerald by 2.2 would clamp its channels one by one and turn it cyan. Switch the limit off when the polish pass adds bloom.
+- *Every surface already drew both sides*: all 236 URP Lit materials have Cull Off and the Section shader culls nothing. The additive glow
+  layers cull back faces on purpose, because stacked additive layers would brighten wherever a back face lies behind a front one. **Validate
+  Topic Data** now reports any other material that culls, and **Enforce Double-Sided Materials** puts it right.
+- *Not applicable here.* Anchoring badges 2 to 5 cm off a surface along its normal and clamping them clear of a floor: this exhibit's
+  badges are discs on the screen plane with a leader line to a point near each structure's middle, and there is no floor. The exterior and
+  cabin lighting rig: there is no vehicle.
+
+**Not verified.** Everything on the glass: whether text at half size reads at 0.5 m (the body text is 18 canvas units, about 5.6 mm), the
+launcher's depth and dust through the glasses, the beam's colours and the music's and the clicks' levels. None of it has run on the display.
+
+---
+
 ## 2026-10-01 — Two activities: the pen carries organs, and the pen cuts the body
 
 **Decision.** "Put the organs back" and "Pen as instrument" are two more topics, `organs` and `scan`. They open from two
@@ -86,6 +170,10 @@ set to Ray.
 
 ## 2026-10-01 — The kiosk shell is a flat three-state loop, and it fades through the canvas
 
+**Amended the same day:** the hub the loop returns to is now the launcher, not the body map, and the attract mode is the launcher
+choosing its own cards, not the body map's tour. Everything below about the fade, the three states, what counts as a visitor and the
+timings still holds. See the launcher entry above.
+
 **Decision.** `KioskShell` (a MonoBehaviour on the `Exhibit` object) runs the exhibit unattended. Its clock and states are
 `KioskFlow`, plain C# with no Unity types. The exhibit opens on the body map (`startTopicId` and `hubTopicId` are both
 `body`). A visitor exploring a region raises `AnatomyTopicController.TopicRequested`; the shell fades the screen to black,
@@ -116,6 +204,9 @@ second press that explores is too easy to do by accident with the pen.
 ---
 
 ## 2026-10-01 — The body map is a bust of glowing layers with the organs set inside it
+
+**Amended the same day:** the body map is no longer the exhibit's menu; the launcher is, and the body map is one of its cards. It is
+still an ordinary topic with its layers, its six places and, by two links, the activities.
 
 **Decision.** The hub is one more topic, `body`, so it gets hover, picking, numbered badges, previous and next, zoom, the
 tour, the caption and the depth keeper for nothing. Its model is a bust (head, neck and chest) of the DOSCH

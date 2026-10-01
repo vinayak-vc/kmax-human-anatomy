@@ -15,6 +15,31 @@ namespace ViitorCloud.KmaxAnatomy {
         private const string OrgansKey = "organs";
         private const string ScanKey = "scan";
 
+        /// <summary>
+        /// Adds the named behaviour in the quiet form a preview shows it in, for the topics whose behaviour is a motion and
+        /// nothing more: the heart beats, the chest breathes, sound travels into the ear and the body map's organs glow, all
+        /// without a sound. A behaviour that is for the visitor's hands, or that works on the model's colliders, is left off,
+        /// and the preview of that topic is still. Returns whether one was attached.
+        /// </summary>
+        public static bool AttachForPreview(GameObject model, string key) {
+            switch (key) {
+                case HeartbeatKey:
+                    model.AddComponent<HeartbeatBehaviour>().Begin(null);
+                    return true;
+                case HearingKey:
+                    model.AddComponent<HearingBehaviour>().Begin(null);
+                    return true;
+                case BreathingKey:
+                    model.AddComponent<BreathingBehaviour>().Begin(null);
+                    return true;
+                case BodyKey:
+                    model.AddComponent<BodyBehaviour>().Begin();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         /// <summary>Adds the named behaviour to the model. An empty key means the topic has none.</summary>
         public static void Attach(GameObject model, string key, AnatomyBehaviourContext context) {
             if (string.IsNullOrEmpty(key)) {

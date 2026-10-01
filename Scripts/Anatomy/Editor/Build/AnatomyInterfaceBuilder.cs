@@ -13,69 +13,75 @@ using ViitorCloud.KmaxDisplay.Editor;
 
 namespace ViitorCloud.KmaxAnatomy.Editor {
     /// <summary>
-    /// Builds the world-space interface: the title, the caption bar, the buttons and the numbered badges. It is
-    /// built in code so it can be rebuilt from nothing, and everything is anchored or laid out by layout groups, so
-    /// it holds at any window aspect and a hidden button leaves no gap.
+    /// Builds the world-space interface: the launcher, and, in a container of their own, the topic's title, caption bar, buttons
+    /// and numbered badges. It is built in code so it can be rebuilt from nothing, and everything is anchored or laid out by
+    /// layout groups, so it holds at any window aspect and a hidden button leaves no gap.
     ///
     /// <para>The canvas is pinned to the screen plane by the SDK's <c>UIScaler</c>, where parallax is zero and
-    /// text is sharpest, and drawn over the model by <see cref="UiAlwaysOnTop"/>. Sizes are in canvas units
-    /// of a 1920 x 1080 reference; on the 27" window one unit is about 0.31 mm.</para>
+    /// text is sharpest, and drawn over the model by <see cref="UiAlwaysOnTop"/>. It has a high sorting order so the
+    /// pen's ray meets a button before it meets a model's collider that happens to float in front of it. Sizes are in canvas
+    /// units of a 1920 x 1080 reference; on the 27" window one unit is about 0.31 mm. Everything is drawn at
+    /// <see cref="AnatomyUiStyle.Scale"/> of the size it was first designed at, as dark glass panels pinned to the corners, so the
+    /// interface stays out of the way of the model in the middle.</para>
     ///
-    /// <para>The caption bar is kept short and low so the model, centred on the screen, clears it. Content
-    /// that would crowd the bar goes in the right-hand column beside the caption, not below it.</para>
+    /// <para>The topic's interface is one container that the kiosk shell switches off while the launcher is up. In it the caption
+    /// bar is a short card low in the middle so the model, centred on the screen, clears it; the title is at the top left; the
+    /// buttons are one column down the right, led by the navigation pill; and the layer buttons are at the left.</para>
     ///
     /// <para>The badges and their lines are a fixed pool, built here and shown as the topic needs them. The
     /// lines are 3D objects at the scene root, not part of the canvas, so they can reach into the model's depth.</para>
     ///
-    /// <para>The layer buttons of the body map are a fixed pool too, down the left edge. The Body map button stands alone
-    /// above the column of controls, and the screen fader, a black panel, is the last thing on the canvas so it covers
-    /// everything.</para>
+    /// <para>The screen fader, a black panel, is the last thing on the canvas so it covers everything.</para>
     /// </summary>
     public static class AnatomyInterfaceBuilder {
         private const string InterfaceName = "Interface";
         private const string MarkerLinesName = "MarkerLines";
+        private const string TopicInterfaceName = "TopicInterface";
+        private const float S = AnatomyUiStyle.Scale;
         private const float ReferenceWidth = 1920f;
         private const float ReferenceHeight = 1080f;
-        private const float ButtonHeight = 92f;
-        private const float ControlsWidth = 400f;
-        private const float ControlsHeight = 560f;
-        private const float ControlsTop = 260f;
-        private const float ControlsSpacing = 18f;
-        private const float RowSpacing = 16f;
-        private const float ZoomButtonWidth = 110f;
-        private const float ButtonFontSize = 38f;
-        private const float SymbolFontSize = 60f;
-        private const float CaptionHeight = 200f;
-        private const float CaptionMainWidth = 1100f;
-        private const float CaptionFactWidth = 600f;
-        private const float CaptionMargin = 40f;
+        private const int SortingOrder = 100;
+        private const float Margin = 64f * S;
+        private const float ButtonHeight = 92f * S;
+        private const float ControlsWidth = 440f * S;
+        private const float ControlsHeight = 560f * S;
+        private const float ControlsTop = 64f * S;
+        private const float ControlsSpacing = 18f * S;
+        private const float RowSpacing = 16f * S;
+        private const float ZoomButtonWidth = 110f * S;
+        private const float ButtonFontSize = 38f * S;
+        private const float PillFontSize = 34f * S;
+        private const float SymbolFontSize = 60f * S;
+        private const float TitleFontSize = 72f * S;
+        private const float SubtitleFontSize = 36f * S;
+        private const float HeaderTop = 44f * S;
+        private const float CaptionWidth = 1040f;
+        private const float CaptionHeight = 124f;
+        private const float CaptionBottom = 24f;
+        private const float CaptionMainWidth = 640f;
+        private const float CaptionFactWidth = 340f;
+        private const float CaptionMargin = 20f;
+        private const float CaptionHeadingSize = 24f;
+        private const float CaptionBodySize = 18f;
+        private const float CaptionFactSize = 15f;
+        private const float CaptionStepSize = 15f;
         public const int MarkerCount = 16;
-        private const float MarkerSlotSize = 84f;
-        private const float MarkerDiscSize = 64f;
-        private const float MarkerRingSize = 72f;
-        private const float MarkerFontSize = 36f;
+        private const float MarkerSlotSize = 56f;
+        private const float MarkerDiscSize = 32f;
+        private const float MarkerRingSize = 36f;
+        private const float MarkerFontSize = 18f;
+        private const float MarkerSpacing = 52f;
         public const int LayerChipCount = 6;
-        private const float LayerPanelWidth = 300f;
-        private const float LayerPanelTop = 290f;
-        private const float LayerHeadingHeight = 44f;
-        private const float LayerChipHeight = 80f;
-        private const float LayerChipSpacing = 14f;
-        private const float LayerChipFontSize = 34f;
-        private const float LayerSwatchSize = 30f;
-        private const float HomeButtonTop = 64f;
+        private const float LayerPanelWidth = 300f * S;
+        private const float LayerPanelTop = 290f * S;
+        private const float LayerHeadingHeight = 44f * S;
+        private const float LayerChipHeight = 80f * S;
+        private const float LayerChipSpacing = 14f * S;
+        private const float LayerChipFontSize = 34f * S;
+        private const float LayerHeadingFontSize = 30f * S;
+        private const float LayerSwatchSize = 30f * S;
         public const int LinkButtonCount = 2;
-        private const float LinkButtonTop = 44f;
-        private const float LinkButtonSpacing = 14f;
-        private const float LinkFontSize = 34f;
-
-        private static readonly Color PanelColor = new Color(0.03f, 0.05f, 0.09f, 0.78f);
-        private static readonly Color ButtonColor = new Color(0.12f, 0.24f, 0.36f, 0.92f);
-        private static readonly Color ExploreButtonColor = new Color(0.08f, 0.42f, 0.5f, 0.96f);
-        private static readonly Color TitleColor = new Color(0.96f, 0.98f, 1f, 1f);
-        private static readonly Color SubtitleColor = new Color(0.62f, 0.76f, 0.9f, 1f);
-        private static readonly Color HeadingColor = new Color(0.55f, 0.9f, 1f, 1f);
-        private static readonly Color BodyColor = new Color(0.94f, 0.96f, 1f, 1f);
-        private static readonly Color FactColor = new Color(1f, 0.85f, 0.55f, 1f);
+        private const float LinkFontSize = 34f * S;
 
         /// <summary>Rebuilds the interface from scratch and returns what needs wiring.</summary>
         /// <param name="eventCamera">The rig's centre camera, which the Kmax raycasters measure against.</param>
@@ -88,6 +94,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             Canvas canvas = root.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = eventCamera;
+            canvas.sortingOrder = SortingOrder;
             root.AddComponent<KmaxUIRaycaster>();
             root.AddComponent<UIScaler>();
             root.AddComponent<UiAlwaysOnTop>();
@@ -97,19 +104,27 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             rootRect.sizeDelta = new Vector2(ReferenceWidth, ReferenceHeight);
             rootRect.localScale = Vector3.one * (windowSize.x / ReferenceWidth);
 
+            // The launcher first, so the topic's interface is drawn and hit-tested over it if both were ever up.
+            AnatomyLauncher launcher = AnatomyLauncherBuilder.BuildInterface(rootRect);
+
+            GameObject topicInterface = new GameObject(TopicInterfaceName, typeof(RectTransform));
+            RectTransform topicRect = topicInterface.GetComponent<RectTransform>();
+            topicRect.SetParent(rootRect, false);
+            AnatomyUiStyle.Anchor(topicRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+
             // Built first, so it is drawn and hit-tested behind the title, the caption and the buttons.
-            AnatomyMarkers markers = BuildMarkers(rootRect);
+            AnatomyMarkers markers = BuildMarkers(topicRect);
 
             TMP_Text titleText;
             TMP_Text subtitleText;
-            BuildHeader(rootRect, out titleText, out subtitleText);
+            BuildHeader(topicRect, out titleText, out subtitleText);
 
             CanvasGroup captionGroup;
             TMP_Text headingText;
             TMP_Text bodyText;
             TMP_Text factText;
             TMP_Text stepText;
-            BuildCaption(rootRect, out captionGroup, out headingText, out bodyText, out factText, out stepText);
+            BuildCaption(topicRect, out captionGroup, out headingText, out bodyText, out factText, out stepText);
 
             AnatomyInfoPanel panel = root.AddComponent<AnatomyInfoPanel>();
             SerializedObject panelObject = new SerializedObject(panel);
@@ -122,12 +137,12 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             KmaxRigBuilder.SetReference(panelObject, "stepText", stepText);
             panelObject.ApplyModifiedPropertiesWithoutUndo();
 
-            AnatomyControls controls = BuildControls(rootRect);
-            AnatomyLayerPanel layers = BuildLayerPanel(rootRect);
+            AnatomyControls controls = BuildControls(topicRect);
+            AnatomyLayerPanel layers = BuildLayerPanel(topicRect);
 
             // Last, so it is drawn over everything else.
             ScreenFader fader = BuildFader(rootRect);
-            return new AnatomyInterfaceParts(panel, controls, markers, layers, fader);
+            return new AnatomyInterfaceParts(panel, controls, markers, layers, fader, topicInterface, launcher);
         }
 
         private static void DestroyExisting(string objectName) {
@@ -141,68 +156,68 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject header = new GameObject("Header", typeof(RectTransform));
             RectTransform headerRect = header.GetComponent<RectTransform>();
             headerRect.SetParent(parent, false);
-            Anchor(headerRect, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(64f, -44f), new Vector2(1300f, 150f));
+            AnatomyUiStyle.Anchor(headerRect, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(Margin, -HeaderTop), new Vector2(700f, 80f));
 
-            titleText = CreateText(headerRect, "Title", 72f, TitleColor, FontStyles.Bold, TextAlignmentOptions.TopLeft);
-            Anchor(titleText.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f),
-                Vector2.zero, new Vector2(0f, 90f));
+            titleText = AnatomyUiStyle.CreateText(headerRect, "Title", TitleFontSize, AnatomyUiStyle.Heading, FontStyles.Bold, TextAlignmentOptions.TopLeft);
+            AnatomyUiStyle.Anchor(titleText.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+                Vector2.zero, new Vector2(0f, 46f));
 
-            subtitleText = CreateText(headerRect, "Subtitle", 36f, SubtitleColor, FontStyles.Normal, TextAlignmentOptions.TopLeft);
-            Anchor(subtitleText.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f),
-                new Vector2(0f, -92f), new Vector2(0f, 50f));
+            subtitleText = AnatomyUiStyle.CreateText(headerRect, "Subtitle", SubtitleFontSize, AnatomyUiStyle.AccentBright, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            AnatomyUiStyle.Anchor(subtitleText.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f),
+                new Vector2(0f, -46f), new Vector2(0f, 28f));
         }
 
         /// <summary>
-        /// A short bar along the bottom. The heading and body stack on the left and are centred vertically, so a
-        /// one-line caption does not sit at the top of an empty box; the extra fact takes the right-hand column.
+        /// A short card low in the middle. The heading and body stack on the left and are centred vertically, so a one-line
+        /// caption does not sit at the top of an empty box; the extra fact takes the right-hand column.
         /// </summary>
         private static void BuildCaption(RectTransform parent, out CanvasGroup group, out TMP_Text headingText,
             out TMP_Text bodyText, out TMP_Text factText, out TMP_Text stepText) {
             GameObject bar = new GameObject("Caption", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
             RectTransform barRect = bar.GetComponent<RectTransform>();
             barRect.SetParent(parent, false);
-            Anchor(barRect, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0f, 48f), new Vector2(-128f, CaptionHeight));
+            AnatomyUiStyle.Anchor(barRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, CaptionBottom), new Vector2(CaptionWidth, CaptionHeight));
 
             Image background = bar.GetComponent<Image>();
-            background.color = PanelColor;
             background.raycastTarget = false;
+            AnatomyUiStyle.ApplyGlass(background, AnatomyUiStyle.Glass);
             group = bar.GetComponent<CanvasGroup>();
             group.blocksRaycasts = false;
 
             GameObject main = new GameObject("Main", typeof(RectTransform), typeof(VerticalLayoutGroup));
             RectTransform mainRect = main.GetComponent<RectTransform>();
             mainRect.SetParent(barRect, false);
-            Anchor(mainRect, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f),
+            AnatomyUiStyle.Anchor(mainRect, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f),
                 Vector2.zero, new Vector2(CaptionMainWidth, 0f));
 
             VerticalLayoutGroup layout = main.GetComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset((int)CaptionMargin, 0, 16, 16);
-            layout.spacing = 8f;
+            layout.padding = new RectOffset((int)CaptionMargin, 0, 10, 10);
+            layout.spacing = 4f;
             layout.childAlignment = TextAnchor.MiddleLeft;
             layout.childControlWidth = true;
             layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            headingText = CreateText(mainRect, "Heading", 48f, HeadingColor, FontStyles.Bold, TextAlignmentOptions.TopLeft);
-            bodyText = CreateText(mainRect, "Body", 36f, BodyColor, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            headingText = AnatomyUiStyle.CreateText(mainRect, "Heading", CaptionHeadingSize, AnatomyUiStyle.AccentBright, FontStyles.Bold, TextAlignmentOptions.TopLeft);
+            bodyText = AnatomyUiStyle.CreateText(mainRect, "Body", CaptionBodySize, AnatomyUiStyle.Body, FontStyles.Normal, TextAlignmentOptions.TopLeft);
 
-            factText = CreateText(barRect, "Fact", 30f, FactColor, FontStyles.Italic, TextAlignmentOptions.MidlineLeft);
-            Anchor(factText.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f),
-                new Vector2(-CaptionMargin, 0f), new Vector2(CaptionFactWidth, -32f));
+            factText = AnatomyUiStyle.CreateText(barRect, "Fact", CaptionFactSize, AnatomyUiStyle.Fact, FontStyles.Italic, TextAlignmentOptions.MidlineLeft);
+            AnatomyUiStyle.Anchor(factText.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f),
+                new Vector2(-CaptionMargin, 0f), new Vector2(CaptionFactWidth, -20f));
 
-            stepText = CreateText(barRect, "Step", 30f, SubtitleColor, FontStyles.Normal, TextAlignmentOptions.TopRight);
-            Anchor(stepText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
-                new Vector2(-CaptionMargin, -16f), new Vector2(400f, 44f));
+            stepText = AnatomyUiStyle.CreateText(barRect, "Step", CaptionStepSize, AnatomyUiStyle.Muted, FontStyles.Normal, TextAlignmentOptions.TopRight);
+            AnatomyUiStyle.Anchor(stepText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-CaptionMargin, -8f), new Vector2(260f, 24f));
         }
 
         private static AnatomyMarkers BuildMarkers(RectTransform parent) {
             GameObject layerObject = new GameObject("Markers", typeof(RectTransform));
             RectTransform layer = layerObject.GetComponent<RectTransform>();
             layer.SetParent(parent, false);
-            Anchor(layer, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(layer, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             Sprite disc = AnatomyMarkerSprites.EnsureDisc();
             Sprite ring = AnatomyMarkerSprites.EnsureRing();
@@ -221,6 +236,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             KmaxRigBuilder.SetReference(markersObject, "layer", layer);
             KmaxRigBuilder.SetReferences(markersObject, "badges", badges);
             KmaxRigBuilder.SetReferences(markersObject, "lines", lines);
+            KmaxRigBuilder.SetFloat(markersObject, "spacing", MarkerSpacing);
             markersObject.ApplyModifiedPropertiesWithoutUndo();
             return markers;
         }
@@ -233,21 +249,21 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject slotObject = new GameObject("Marker" + number + "Slot", typeof(RectTransform));
             RectTransform slot = slotObject.GetComponent<RectTransform>();
             slot.SetParent(parent, false);
-            Anchor(slot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            AnatomyUiStyle.Anchor(slot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 Vector2.zero, new Vector2(MarkerSlotSize, MarkerSlotSize));
 
             GameObject host = new GameObject("Marker" + number, typeof(RectTransform), typeof(Image));
             RectTransform hostRect = host.GetComponent<RectTransform>();
             hostRect.SetParent(slot, false);
-            Anchor(hostRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(hostRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             Image hitArea = host.GetComponent<Image>();
             hitArea.color = new Color(0f, 0f, 0f, 0f);
             hitArea.raycastTarget = true;
 
             Image disc = CreateImage(hostRect, "Disc", discSprite, MarkerDiscSize);
             Image ring = CreateImage(hostRect, "Ring", ringSprite, MarkerRingSize);
-            TextMeshProUGUI numberText = CreateText(hostRect, "Number", MarkerFontSize, TitleColor, FontStyles.Bold, TextAlignmentOptions.Center);
-            Anchor(numberText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            TextMeshProUGUI numberText = AnatomyUiStyle.CreateText(hostRect, "Number", MarkerFontSize, AnatomyUiStyle.Heading, FontStyles.Bold, TextAlignmentOptions.Center);
+            AnatomyUiStyle.Anchor(numberText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             AnatomyMarker marker = host.AddComponent<AnatomyMarker>();
             SerializedObject markerObject = new SerializedObject(marker);
@@ -257,10 +273,10 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             KmaxRigBuilder.SetReference(markerObject, "numberText", numberText);
             markerObject.ApplyModifiedPropertiesWithoutUndo();
 
+            // A badge swells more than a button does: it is a small target that has to say it has been found.
             UiButtonMotion motion = host.AddComponent<UiButtonMotion>();
             SerializedObject motionObject = new SerializedObject(motion);
             KmaxRigBuilder.SetFloat(motionObject, "hoverScale", 1.18f);
-            KmaxRigBuilder.SetFloat(motionObject, "hoverLift", 0f);
             KmaxRigBuilder.SetBool(motionObject, "pressFlash", false);
             motionObject.ApplyModifiedPropertiesWithoutUndo();
             return marker;
@@ -270,7 +286,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject host = new GameObject(objectName, typeof(RectTransform), typeof(Image));
             RectTransform rect = host.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            Anchor(rect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size, size));
+            AnatomyUiStyle.Anchor(rect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size, size));
             Image image = host.GetComponent<Image>();
             image.sprite = sprite;
             image.raycastTarget = false;
@@ -299,12 +315,17 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             return line;
         }
 
+        /// <summary>
+        /// The column of buttons down the right edge, stacked from the top by one layout so a button that is not shown leaves no
+        /// gap: the navigation pill (Menu and Next side by side), the links a topic offers, Explore, the tour, the exploded view,
+        /// Previous and Next, the zoom and Reset.
+        /// </summary>
         private static AnatomyControls BuildControls(RectTransform parent) {
             GameObject column = new GameObject("Controls", typeof(RectTransform), typeof(VerticalLayoutGroup));
             RectTransform columnRect = column.GetComponent<RectTransform>();
             columnRect.SetParent(parent, false);
-            Anchor(columnRect, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
-                new Vector2(-64f, -ControlsTop), new Vector2(ControlsWidth, ControlsHeight));
+            AnatomyUiStyle.Anchor(columnRect, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-Margin, -ControlsTop), new Vector2(ControlsWidth, ControlsHeight));
 
             VerticalLayoutGroup layout = column.GetComponent<VerticalLayoutGroup>();
             layout.spacing = ControlsSpacing;
@@ -315,7 +336,6 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             layout.childForceExpandHeight = false;
 
             GameObject exploreSlot;
-            GameObject homeSlot;
             GameObject tourSlot;
             GameObject explodeSlot;
             GameObject previousSlot;
@@ -323,8 +343,9 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject zoomOutSlot;
             GameObject zoomInSlot;
             GameObject resetSlot;
+            GameObject homeSlot;
+            GameObject nextExhibitSlot;
             TMP_Text exploreLabel;
-            TMP_Text homeLabel;
             TMP_Text tourLabel;
             TMP_Text explodeLabel;
             TMP_Text previousLabel;
@@ -332,9 +353,27 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             TMP_Text zoomOutLabel;
             TMP_Text zoomInLabel;
             TMP_Text resetLabel;
+            TMP_Text homeLabel;
+            TMP_Text nextExhibitLabel;
+
+            // The pill takes the top of the column, and its row holds both halves. Next exhibit is the wider half, because its words
+            // are longer, and its name sets it apart from the Next that steps through a topic's structures.
+            RectTransform pillRow = CreateRow(columnRect, "NavigationPill", true);
+            Button home = CreateButton(pillRow, "Home", "Menu", PillFontSize, 0f, out homeSlot, out homeLabel);
+            Button nextExhibit = CreateButton(pillRow, "NextExhibit", "Next exhibit", PillFontSize, 0f, out nextExhibitSlot, out nextExhibitLabel);
+            homeSlot.GetComponent<LayoutElement>().flexibleWidth = 1f;
+            nextExhibitSlot.GetComponent<LayoutElement>().flexibleWidth = 1.7f;
+
+            // A topic that leads to others offers them here, ahead of the topic's own buttons; they are never all shown at once.
+            GameObject[] linkSlots = new GameObject[LinkButtonCount];
+            Button[] linkButtons = new Button[LinkButtonCount];
+            TMP_Text[] linkLabels = new TMP_Text[LinkButtonCount];
+            for (int i = 0; i < LinkButtonCount; i++) {
+                linkButtons[i] = CreateButton(columnRect, "Link" + (i + 1), "Link", LinkFontSize, 0f, out linkSlots[i], out linkLabels[i]);
+            }
 
             Button explore = CreateButton(columnRect, "Explore", "Explore", ButtonFontSize, 0f, out exploreSlot, out exploreLabel);
-            explore.GetComponent<Image>().color = ExploreButtonColor;
+            AnatomyUiStyle.ApplyGlass(explore.GetComponent<Image>(), AnatomyUiStyle.GlassChosen);
             Button tour = CreateButton(columnRect, "Tour", "Start tour", ButtonFontSize, 0f, out tourSlot, out tourLabel);
             Button explode = CreateButton(columnRect, "Explode", "Explode", ButtonFontSize, 0f, out explodeSlot, out explodeLabel);
 
@@ -344,35 +383,20 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
 
             RectTransform zoomRow = CreateRow(columnRect, "ZoomRow", false);
             Button zoomOut = CreateButton(zoomRow, "ZoomOut", "-", SymbolFontSize, ZoomButtonWidth, out zoomOutSlot, out zoomOutLabel);
-            TextMeshProUGUI zoomText = CreateText(zoomRow, "ZoomReadout", ButtonFontSize, SubtitleColor, FontStyles.Bold, TextAlignmentOptions.Center);
+            TextMeshProUGUI zoomText = AnatomyUiStyle.CreateText(zoomRow, "ZoomReadout", ButtonFontSize, AnatomyUiStyle.AccentBright, FontStyles.Bold, TextAlignmentOptions.Center);
             zoomText.text = "1.0x";
             zoomText.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
             Button zoomIn = CreateButton(zoomRow, "ZoomIn", "+", SymbolFontSize, ZoomButtonWidth, out zoomInSlot, out zoomInLabel);
 
             Button reset = CreateButton(columnRect, "Reset", "Reset view", ButtonFontSize, 0f, out resetSlot, out resetLabel);
 
-            // Beside Body map, in the same corner, a body map offers the activities as links. They are never shown together.
-            GameObject[] linkSlots = new GameObject[LinkButtonCount];
-            Button[] linkButtons = new Button[LinkButtonCount];
-            TMP_Text[] linkLabels = new TMP_Text[LinkButtonCount];
-            for (int i = 0; i < LinkButtonCount; i++) {
-                linkButtons[i] = CreateButton(parent, "Link" + (i + 1), "Link", LinkFontSize, 0f, out linkSlots[i], out linkLabels[i]);
-                float top = LinkButtonTop + i * (ButtonHeight + LinkButtonSpacing);
-                Anchor(linkSlots[i].GetComponent<RectTransform>(), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
-                    new Vector2(-64f, -top), new Vector2(ControlsWidth, ButtonHeight));
-            }
-
-            // Above the column, in the corner, where a visitor can always find the way back to the body map.
-            Button home = CreateButton(parent, "Home", "Body map", ButtonFontSize, 0f, out homeSlot, out homeLabel);
-            Anchor(homeSlot.GetComponent<RectTransform>(), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
-                new Vector2(-64f, -HomeButtonTop), new Vector2(ControlsWidth, ButtonHeight));
-
             AnatomyControls controls = column.AddComponent<AnatomyControls>();
             SerializedObject controlsObject = new SerializedObject(controls);
             KmaxRigBuilder.SetReference(controlsObject, "exploreSlot", exploreSlot);
             KmaxRigBuilder.SetReference(controlsObject, "exploreButton", explore);
-            KmaxRigBuilder.SetReference(controlsObject, "homeSlot", homeSlot);
+            KmaxRigBuilder.SetReference(controlsObject, "homeSlot", pillRow.gameObject);
             KmaxRigBuilder.SetReference(controlsObject, "homeButton", home);
+            KmaxRigBuilder.SetReference(controlsObject, "nextExhibitButton", nextExhibit);
             KmaxRigBuilder.SetReference(controlsObject, "tourSlot", tourSlot);
             KmaxRigBuilder.SetReference(controlsObject, "tourButton", tour);
             KmaxRigBuilder.SetReference(controlsObject, "tourLabel", tourLabel);
@@ -406,13 +430,13 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             RectTransform panelRect = panelObject.GetComponent<RectTransform>();
             panelRect.SetParent(parent, false);
             float panelHeight = LayerHeadingHeight + LayerChipCount * (LayerChipHeight + LayerChipSpacing);
-            Anchor(panelRect, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 1f),
-                new Vector2(64f, LayerPanelTop), new Vector2(LayerPanelWidth, panelHeight));
+            AnatomyUiStyle.Anchor(panelRect, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 1f),
+                new Vector2(Margin, LayerPanelTop), new Vector2(LayerPanelWidth, panelHeight));
 
             GameObject contentObject = new GameObject("Chips", typeof(RectTransform), typeof(VerticalLayoutGroup));
             RectTransform content = contentObject.GetComponent<RectTransform>();
             content.SetParent(panelRect, false);
-            Anchor(content, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(content, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             VerticalLayoutGroup layout = contentObject.GetComponent<VerticalLayoutGroup>();
             layout.spacing = LayerChipSpacing;
@@ -422,7 +446,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            TextMeshProUGUI heading = CreateText(content, "Heading", 30f, SubtitleColor, FontStyles.Bold, TextAlignmentOptions.BottomLeft);
+            TextMeshProUGUI heading = AnatomyUiStyle.CreateText(content, "Heading", LayerHeadingFontSize, AnatomyUiStyle.Muted, FontStyles.Bold, TextAlignmentOptions.BottomLeft);
             heading.text = "Show";
             heading.gameObject.AddComponent<LayoutElement>().preferredHeight = LayerHeadingHeight;
 
@@ -450,25 +474,21 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject host = new GameObject("LayerChip" + number, typeof(RectTransform), typeof(Image), typeof(Button));
             RectTransform hostRect = host.GetComponent<RectTransform>();
             hostRect.SetParent(slot, false);
-            Anchor(hostRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(hostRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             Image background = host.GetComponent<Image>();
-            background.color = ButtonColor;
+            AnatomyUiStyle.ApplyGlass(background, AnatomyUiStyle.Glass);
             Button button = host.GetComponent<Button>();
             button.targetGraphic = background;
             button.transition = Selectable.Transition.None;
-
-            UiButtonMotion motion = host.AddComponent<UiButtonMotion>();
-            SerializedObject motionObject = new SerializedObject(motion);
-            KmaxRigBuilder.SetReference(motionObject, "tintTarget", background);
-            motionObject.ApplyModifiedPropertiesWithoutUndo();
+            AnatomyUiStyle.AddButtonFeel(host, background, AnatomyUiStyle.GlassHover, false);
 
             Image swatch = CreateImage(hostRect, "Swatch", discSprite, LayerSwatchSize);
-            Anchor(swatch.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
-                new Vector2(24f, 0f), new Vector2(LayerSwatchSize, LayerSwatchSize));
+            AnatomyUiStyle.Anchor(swatch.rectTransform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(0f, 0.5f),
+                new Vector2(12f, 0f), new Vector2(LayerSwatchSize, LayerSwatchSize));
 
-            TextMeshProUGUI label = CreateText(hostRect, "Label", LayerChipFontSize, TitleColor, FontStyles.Bold, TextAlignmentOptions.MidlineLeft);
-            Anchor(label.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(33f, 0f), new Vector2(-86f, 0f));
+            TextMeshProUGUI label = AnatomyUiStyle.CreateText(hostRect, "Label", LayerChipFontSize, AnatomyUiStyle.Heading, FontStyles.Bold, TextAlignmentOptions.MidlineLeft);
+            AnatomyUiStyle.Anchor(label.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(16.5f, 0f), new Vector2(-43f, 0f));
 
             AnatomyLayerChip chip = host.AddComponent<AnatomyLayerChip>();
             SerializedObject chipObject = new SerializedObject(chip);
@@ -488,7 +508,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject host = new GameObject("Fader", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
             RectTransform rect = host.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            Anchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             Image panel = host.GetComponent<Image>();
             panel.color = Color.black;
@@ -511,7 +531,10 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             layout.childControlWidth = true;
             layout.childControlHeight = true;
             layout.childForceExpandWidth = share;
-            layout.childForceExpandHeight = true;
+
+            // A row that forced its height to expand would take any room the column has to spare, and the pill would swell when a
+            // topic shows only a few buttons. Each button is already as tall as the row.
+            layout.childForceExpandHeight = false;
             return rect;
         }
 
@@ -537,46 +560,19 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             GameObject host = new GameObject(objectName, typeof(RectTransform), typeof(Image), typeof(Button));
             RectTransform rect = host.GetComponent<RectTransform>();
             rect.SetParent(slotRect, false);
-            Anchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            AnatomyUiStyle.Anchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 
             Image image = host.GetComponent<Image>();
-            image.color = ButtonColor;
+            AnatomyUiStyle.ApplyGlass(image, AnatomyUiStyle.Glass);
             Button button = host.GetComponent<Button>();
             button.targetGraphic = image;
             button.transition = Selectable.Transition.None;
+            AnatomyUiStyle.AddButtonFeel(host, image, AnatomyUiStyle.GlassHover, false);
 
-            UiButtonMotion motion = host.AddComponent<UiButtonMotion>();
-            SerializedObject motionObject = new SerializedObject(motion);
-            KmaxRigBuilder.SetReference(motionObject, "tintTarget", image);
-            motionObject.ApplyModifiedPropertiesWithoutUndo();
-
-            labelText = CreateText(rect, "Label", fontSize, TitleColor, FontStyles.Bold, TextAlignmentOptions.Center);
-            Anchor(labelText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            labelText = AnatomyUiStyle.CreateText(rect, "Label", fontSize, AnatomyUiStyle.Heading, FontStyles.Bold, TextAlignmentOptions.Center);
+            AnatomyUiStyle.Anchor(labelText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             labelText.text = label;
             return button;
-        }
-
-        private static TextMeshProUGUI CreateText(RectTransform parent, string objectName, float fontSize, Color color,
-            FontStyles style, TextAlignmentOptions alignment) {
-            GameObject host = new GameObject(objectName, typeof(RectTransform));
-            host.transform.SetParent(parent, false);
-            TextMeshProUGUI text = host.AddComponent<TextMeshProUGUI>();
-            text.fontSize = fontSize;
-            text.color = color;
-            text.fontStyle = style;
-            text.alignment = alignment;
-            text.textWrappingMode = TextWrappingModes.Normal;
-            text.raycastTarget = false;
-            return text;
-        }
-
-        private static void Anchor(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot,
-            Vector2 anchoredPosition, Vector2 sizeDelta) {
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-            rect.pivot = pivot;
-            rect.anchoredPosition = anchoredPosition;
-            rect.sizeDelta = sizeDelta;
         }
     }
 }

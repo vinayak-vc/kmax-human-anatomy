@@ -1,0 +1,15 @@
+{
+  "title": "SELECT AN EXHIBIT",
+  "loadFormat": "Load {0}",
+  "entries": [
+    { "topic": "body", "label": "The Human Body" },
+    { "topic": "heart", "label": "The Heart" },
+    { "topic": "brain", "label": "The Brain" },
+    { "topic": "ear", "label": "The Ear" },
+    { "topic": "eye", "label": "The Eye" },
+    { "topic": "breathing", "label": "Breathing" },
+    { "topic": "skull", "label": "Skull and Face" },
+    { "topic": "organs", "label": "Put the Organs Back" },
+    { "topic": "scan", "label": "Scan the Body" }
+  ]
+}

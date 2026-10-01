@@ -1,5 +1,36 @@
 # Tasks
 
+## Done — 2026-10-01 (the launcher and the house style)
+
+- [x] Launcher: the exhibit opens on, and returns to, nine cards (a row of five over a row of four) with the chosen exhibit's own model
+      turning above them on a turntable that pops out of the glass, a Load button below, and drifting dust on a slate backdrop
+      (`AnatomyLauncher`, `LauncherCard`, `LauncherPreview`, `LauncherFit`; data in `Content/Resources/Launcher/launcher.json`). Press a
+      card to choose it, press it again or Load to open it. It is a screen in `Main.unity`, not a topic: `KioskShell` shows and hides it
+      behind the fade, and the topic's whole interface is one container (`TopicInterface`) that is off while the launcher is up.
+- [x] Menu and Next exhibit: a pill at the top of every topic's button column. Menu goes to the launcher; Next exhibit steps through the
+      cards' order and goes to the launcher after the last. Attract mode is now the launcher choosing its own cards.
+- [x] Launcher pictures rendered from the models (`AnatomyLauncherThumbnails`, **Kmax → Anatomy → Build → Launcher Thumbnails**, also the
+      last step of **Import → All Topics**), into `Generated/Resources/Anatomy/Thumbs`, which git ignores.
+- [x] The interface restyled as dark glass at half size, every screen: `AnatomyUiStyle` (palette and `Scale`), `AnatomyGlassSprites`,
+      `AnatomySpriteFiles`; `AnatomyInterfaceBuilder` rewritten onto them with the topic's interface in one container, the control column as
+      one layout (no gap when a button is hidden) and the canvas at sorting order 100. Badges are smaller, their hit areas are not.
+- [x] Buttons are damped springs (`UiSpring`, `UiButtonMotion`: hover 1.04, press 0.94 and a 2 mm sink, frequency 18, damping 0.7); every
+      button also ticks on hover and drops on press (`UiButtonSound`).
+- [x] Audio: `PersistentAudioDirector` plays a seamless pentatonic music bed and the button sounds across scene loads;
+      `ProceduralAudio` gained `CreateUiHoverTick`, `CreateUiClick`, `CreateExpandSweep`, `CreateCollapseSweep`, `CreateHotspotChime` and
+      `CreateAmbientMusic`; `AnatomyAudio` uses the bell and the sweeps and no longer plays its own pad.
+- [x] Pen beam in four colours (`StylusBeam`, `StylusBeamStates`) and, for the first time, attached: `KmaxRigBuilder.EnsureBeam` swaps it for
+      the SDK's ray.
+- [x] Double-sided: audited (all 236 Lit materials, the Section shader and the new materials draw both sides; only the additive glow layers
+      cull back, on purpose). **Validate Topic Data** reports a material that culls; **Enforce Double-Sided Materials** fixes it.
+- [x] Validator: checks the launcher's cards (topic exists, no duplicates, fits the pool, has a picture).
+- [x] Verified in the Editor, console clean, **Validate Topic Data** clean, whitespace check clean for `KmaxAnatomy`, `KmaxAnatomy.Editor` and
+      the new framework files: all nine previews through a full turn (nearest -71 to -108 mm of the -115 limit, farthest under +50 mm, clear of
+      the title and the cards); choosing, pressing again, Load, Menu, Next exhibit all the way round to the launcher, the idle return and the
+      attract cycle with shortened timers; the camera backgrounds, dust and previews put back or cleared on leaving; a collider 60 mm in front
+      of a card losing to it at sorting order 100 and winning at 0; the spring (4.6% overshoot, settled in 0.38 s) and the beam's four
+      colours by simulated presses; the audio clips (durations, pitch, seam) and a simulated hover and press sounding through the director.
+
 ## Done — 2026-10-01 (Put the organs back, and Pen as instrument)
 
 - [x] Two activities, opened from two buttons at the top of the body map (`links` in `body.json`) and left by Body map: `organs` and
@@ -166,24 +197,34 @@
 The user's build order is complete (eye, breathing, skull, the body map hub), and so are the two activities that were held back until
 the scenes were reviewed. In priority order. None of these needs hardware; what does is under "Needs hardware".
 
-1. [ ] **The user's review** of every scene and both activities (the Game view, F1 to F9), and the changes it asks for. These come
-       before everything below. *Done when:* the user has a list of changes, or has signed the scenes off.
+1. [ ] **The user's review** of the launcher, every scene and both activities (the Game view, F1 to F10), and the changes it asks for.
+       These come before everything below. *Done when:* the user has a list of changes, or has signed the scenes off.
 2. [ ] **Polish.** A post-processing Volume through `StereoPostProcessing`, MSAA in the URP asset (thin lines and vessels alias at
        1x), a subtle backdrop, a pass on emphasis strength, ghost opacity and the rings' width, and brighter cut faces in the scan
        (`AnatomySectionMaterials`). *Done when:* every topic has been looked at again in the Game view and the console is clean.
 3. [ ] **Windows Standalone build** through the template's build tooling; add `Scene/Main.unity` to `GameInfoSO`. *Done when:* a build
-       opens on the body map and every topic loads. Topics load from `Resources`, and the materials reference the Glow and Section
+       opens on the launcher and every topic loads. Topics load from `Resources`, and the materials reference the Glow and Section
        shaders directly. `ComfortOverlay` is the one runtime `Shader.Find` (URP Unlit): keep it out of the shipped scene or include that shader.
 4. [ ] **`Kmax -> Audit Comfort Volume`** clean for every topic, zoomed and turned, and for the two activities (the loose organs float
        50 mm in front of the glass, and the lens's outline reaches 30 mm nearer than the tip). *Done when:* the audit reports nothing outside the budget.
-5. [ ] **Commit,** only when the user asks. Check out `main` first: the nested repo is on a detached HEAD at the initial commit, with
-       everything untracked. `Generated/` and `Source~/` stay ignored, and no DOSCH data is committed.
+5. [ ] **Commit,** only when the user asks. The nested repo is on `main`; the user committed the exhibit before the launcher
+       (`46327ec`), and the launcher, the glass interface and the docs since are uncommitted. `Generated/` (which now holds the launcher's
+       pictures) and `Source~/` stay ignored, and no DOSCH data is committed.
 6. [ ] **Clinical review** of every topic's text and of the activities' cards. Not a coding task: ask the user who reviews it.
 
 Ideas that were pitched and not agreed are in the backlog in [roadmap.md](roadmap.md). Do not start them unasked.
 
 ## Needs hardware
 
+- [ ] **Judge the half-size interface.** Body text is 18 canvas units (about 5.6 mm), buttons 46 units (about 14 mm), badges 32 with a 56
+      unit hit area. Does the caption read at 0.5 m, and can the pen hit a button and a badge? `AnatomyUiStyle.Scale` is one number; rebuild
+      the scene to change it.
+- [ ] Judge the launcher through the glasses: does the model fuse at 30 mm out, do the dust motes (-90 to +210 mm) read as depth or as noise,
+      does the slate backdrop (`AnatomyLauncher.backdropColor`) suit, are the cards easy to hit?
+- [ ] Judge the beam: are the four colours (cyan, emerald, amber, violet) told apart, and does the bead at its end show? The HDR emission is
+      limited to the display range until the cameras have bloom (`StylusBeam.limitToDisplayRange`).
+- [ ] Listen to the music bed (`PersistentAudioDirector.musicVolume`, 0.14) and the button tick and drop on the display's speakers; the
+      levels were set blind.
 - [ ] Verify `Kmax → SDK Backend` shows XR Core checked, and that switching both ways works.
 - [ ] Run the Main scene on the 27" display: head tracking, convergence, stylus pose, buttons, haptics.
 - [ ] Confirm which pen button is primary and reconcile `KmaxStylus.PrimaryKey` with `StylusNavigation`. The pen's
@@ -231,10 +272,16 @@ Ideas that were pitched and not agreed are in the backlog in [roadmap.md](roadma
   bone-coloured tint. The heart and the eye are drawn in one averaged tint of their groups, with their atlas.
 - The brain's target has a gap about a millimetre wide down the middle, where the two hemispheres part.
 - Vessels and nerves are thin lines at the opening zoom, and faint; the nerves layer is mostly the spinal cord.
-- The attract mode is not silent: the tour's cue sounds at each step.
+- The attract mode makes no cue sound of its own, but the music bed plays under it as it does everywhere.
+- The launcher's previews of the eye and of the skull and face are still: their behaviours work on soft colliders, which a preview does not
+  have. The heart, the breathing chest, the ear and the body map move.
+- The launcher's cards show their names alone on a fresh clone, until the models are imported and **Launcher Thumbnails** is run.
+- The body map keeps its two activity links, which the launcher's cards now duplicate. Remove `links` from `body.json` if one way in is
+  wanted.
+- The launcher and the topics' screens were laid out at half size by scaling the first design, not by redesigning it: the caption is
+  still a card low in the middle and the buttons a column at the right, not the top-left and top-right panels of the house style's wording.
 - A second press on a picked region explores it, so on the body map a region cannot be put down by pressing it again.
-- Nothing is committed yet. The nested repo is on a detached HEAD at the initial commit; check out `main`
-  before committing.
+- The launcher and the glass interface are not committed. The user committed everything before them on `main` (`46327ec`).
 - The DOSCH eye's macula lies about 24 degrees above the optic axis, so the light rays meet it at an angle.
 - The breathing topic has no heart between its lungs; the ribs, cartilage and breastbone are the only solid bone.
 - The DOSCH ossicles are about 40% of real size (the stirrup is 1 mm; a real one is about 3 mm), so the text gives real

@@ -193,6 +193,82 @@ namespace ViitorCloud.KmaxDisplay.Editor {
             }
         }
 
+        /// <summary>
+        /// Gives the pen the exhibit's beam in place of the SDK's ray. A <see cref="StylusBeam"/> goes on the object the stylus
+        /// draws its visual on, using the SDK's own line, with a small bead at the end of it in place of the SDK's particle dot, and
+        /// the SDK's <c>StylusRay</c> is removed: the stylus takes the first pointer visual it finds on that object.
+        /// </summary>
+        /// <param name="tipMaterialPath">Where the bead's unlit material is kept.</param>
+        public static StylusBeam EnsureBeam(GameObject rig, string tipMaterialPath) {
+            KmaxStylus stylus = rig != null ? rig.GetComponentInChildren<KmaxStylus>(true) : null;
+            if (stylus == null) {
+                Debug.LogWarning("[Kmax] the rig has no stylus, so the beam was not set up.");
+                return null;
+            }
+
+            SerializedObject stylusObject = new SerializedObject(stylus);
+            SerializedProperty visualProperty = stylusObject.FindProperty("stylus");
+            Transform visual = visualProperty != null ? visualProperty.objectReferenceValue as Transform : null;
+            LineRenderer line = visual != null ? visual.GetComponentInChildren<LineRenderer>(true) : null;
+            if (visual == null || line == null) {
+                Debug.LogWarning("[Kmax] the stylus has no visual with a line, so the beam was not set up.");
+                return null;
+            }
+
+            Transform sdkPointer = visual.Find("pointer");
+            if (sdkPointer != null) {
+                sdkPointer.gameObject.SetActive(false);
+            }
+
+            GameObject bead = FindOrCreateChild(visual, "BeamTip");
+
+            // The beam resizes and places the bead every frame; this is only what the scene view shows until then.
+            bead.transform.localPosition = Vector3.zero;
+            bead.transform.localScale = Vector3.one * 0.006f;
+            MeshFilter beadMesh = bead.GetComponent<MeshFilter>();
+            if (beadMesh == null) {
+                beadMesh = bead.AddComponent<MeshFilter>();
+            }
+
+            beadMesh.sharedMesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+            MeshRenderer beadRenderer = bead.GetComponent<MeshRenderer>();
+            if (beadRenderer == null) {
+                beadRenderer = bead.AddComponent<MeshRenderer>();
+            }
+
+            Material beadMaterial = EnsureUnlitMaterial(tipMaterialPath, Color.white);
+            if (beadMaterial != null) {
+                // Every surface in the suite draws both sides.
+                beadMaterial.SetFloat("_Cull", 0f);
+            }
+
+            beadRenderer.sharedMaterial = beadMaterial;
+            beadRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            beadRenderer.receiveShadows = false;
+
+            StylusBeam beam = visual.GetComponent<StylusBeam>();
+            if (beam == null) {
+                beam = visual.gameObject.AddComponent<StylusBeam>();
+            }
+
+            SerializedObject beamObject = new SerializedObject(beam);
+            SetReference(beamObject, "beam", line);
+            SetReference(beamObject, "tip", bead.transform);
+            SetReference(beamObject, "tipRenderer", beadRenderer);
+            SetBool(beamObject, "alignTipToSurface", false);
+            // The controller already ticks the pen when a structure is pointed at, and a second pulse on top would buzz.
+            SetBool(beamObject, "vibrateOnHitEnter", false);
+            beamObject.ApplyModifiedPropertiesWithoutUndo();
+
+            StylusRay sdkRay = visual.GetComponent<StylusRay>();
+            if (sdkRay != null) {
+                Object.DestroyImmediate(sdkRay, true);
+            }
+
+            EditorUtility.SetDirty(beam);
+            return beam;
+        }
+
         public static GameObject FindOrCreateRoot(string rootName) {
             Scene scene = SceneManager.GetActiveScene();
             GameObject[] roots = scene.GetRootGameObjects();
@@ -320,6 +396,14 @@ namespace ViitorCloud.KmaxDisplay.Editor {
                 return;
             }
             property.stringValue = value;
+        }
+
+        public static void SetColor(SerializedObject target, string field, Color value) {
+            SerializedProperty property = Find(target, field, "color");
+            if (property == null) {
+                return;
+            }
+            property.colorValue = value;
         }
 
         public static void SetBounds(SerializedObject target, string field, Bounds value) {

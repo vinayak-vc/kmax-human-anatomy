@@ -4,9 +4,13 @@ using ViitorCloud.KmaxDisplay;
 
 namespace ViitorCloud.KmaxAnatomy {
     /// <summary>
-    /// The exhibit's ambience and interface sounds. Everything is synthesised at start by
-    /// <see cref="ProceduralAudio"/>, so there are no audio assets to ship, and every sound has an override
-    /// slot so recorded audio is an inspector edit and not a code change.
+    /// The exhibit's content sounds: the cues for pointing at and picking structures, pulling a topic apart and resetting it,
+    /// and the loops that belong to a topic (the heartbeat, the ear's tone, the breath) and the puzzle's chimes. Everything is
+    /// synthesised at start by <see cref="ProceduralAudio"/>, so there are no audio assets to ship, and every sound has an
+    /// override slot so recorded audio is an inspector edit and not a code change.
+    ///
+    /// <para>The music under everything, and the sound of the buttons, belong to the
+    /// <see cref="PersistentAudioDirector"/>, which outlasts any one topic.</para>
     /// </summary>
     public class AnatomyAudio : MonoBehaviour {
         private const float MinimumHoverInterval = 0.08f;
@@ -15,14 +19,16 @@ namespace ViitorCloud.KmaxAnatomy {
         private static readonly int[] PlacedSemitones = new int[] { 0, 2, 4, 7, 9, 12, 14, 16, 19, 21 };
 
         [Header("Overrides")]
-        [SerializeField, Tooltip("Looping bed under everything. Empty uses the synthesised pad.")]
-        private AudioClip ambienceClip;
         [SerializeField, Tooltip("The pointer arrives on a structure. Empty uses a synthesised blip.")]
         private AudioClip hoverClip;
-        [SerializeField, Tooltip("A structure is picked, or a tour step is shown. Empty uses a synthesised chime.")]
+        [SerializeField, Tooltip("A structure is picked, or a tour step is shown. Empty uses a synthesised soft bell, E5 and B5.")]
         private AudioClip selectClip;
-        [SerializeField, Tooltip("The view is reset. Empty uses a synthesised thud.")]
+        [SerializeField, Tooltip("The view is reset. Empty uses a synthesised falling sweep.")]
         private AudioClip resetClip;
+        [SerializeField, Tooltip("A topic is pulled apart. Empty uses a synthesised rising sweep.")]
+        private AudioClip expandClip;
+        [SerializeField, Tooltip("A topic is put back together. Empty uses a synthesised falling sweep.")]
+        private AudioClip collapseClip;
         [SerializeField, Tooltip("One heartbeat as a seamless loop. Empty uses the synthesised beat.")]
         private AudioClip heartbeatClip;
         [SerializeField, Tooltip("One sound going into the ear, with the quiet after it, as a seamless loop. Empty uses the synthesised tone.")]
@@ -35,13 +41,11 @@ namespace ViitorCloud.KmaxAnatomy {
         private AudioClip completeClip;
 
         [Header("Levels")]
-        [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.16f;
         [SerializeField, Range(0f, 1f)] private float cueVolume = 0.45f;
         [SerializeField, Range(0f, 1f)] private float heartbeatVolume = 0.5f;
         [SerializeField, Range(0f, 1f)] private float hearingVolume = 0.35f;
         [SerializeField, Range(0f, 1f)] private float breathingVolume = 0.3f;
 
-        private AudioSource _ambience;
         private AudioSource _cues;
         private AudioSource _heartbeat;
         private AudioSource _hearing;
@@ -52,11 +56,11 @@ namespace ViitorCloud.KmaxAnatomy {
         private AudioClip _hover;
         private AudioClip _select;
         private AudioClip _reset;
+        private AudioClip _expand;
+        private AudioClip _collapse;
         private float _lastHoverTime = -1f;
 
         private void Awake() {
-            _ambience = CreateSource("Ambience", true, ambienceVolume);
-            _ambience.clip = ambienceClip != null ? ambienceClip : ProceduralAudio.CreatePad();
             _cues = CreateSource("Cues", false, cueVolume);
             _heartbeat = CreateSource("Heartbeat", true, heartbeatVolume);
             _hearing = CreateSource("Hearing", true, hearingVolume);
@@ -64,14 +68,12 @@ namespace ViitorCloud.KmaxAnatomy {
             _rewards = CreateSource("Rewards", false, cueVolume);
 
             _hover = hoverClip != null ? hoverClip : ProceduralAudio.CreateBlip();
-            _select = selectClip != null ? selectClip : ProceduralAudio.CreateChime();
-            _reset = resetClip != null ? resetClip : ProceduralAudio.CreateThud();
+            _select = selectClip != null ? selectClip : ProceduralAudio.CreateHotspotChime();
+            _reset = resetClip != null ? resetClip : ProceduralAudio.CreateCollapseSweep();
+            _expand = expandClip != null ? expandClip : ProceduralAudio.CreateExpandSweep();
+            _collapse = collapseClip != null ? collapseClip : ProceduralAudio.CreateCollapseSweep();
             _placed = placedClip != null ? placedClip : ProceduralAudio.CreateChime(523.25f, 1.1f, 0.9f);
             _complete = completeClip != null ? completeClip : ProceduralAudio.CreateFanfare();
-        }
-
-        private void Start() {
-            _ambience.Play();
         }
 
         /// <summary>The pointer arrived on a structure. Rate limited, so a sweep across many does not chatter.</summary>
@@ -90,6 +92,16 @@ namespace ViitorCloud.KmaxAnatomy {
 
         public void PlayReset() {
             _cues.PlayOneShot(_reset, 0.8f);
+        }
+
+        /// <summary>A topic is being pulled apart.</summary>
+        public void PlayExpand() {
+            _cues.PlayOneShot(_expand, 0.8f);
+        }
+
+        /// <summary>A topic is being put back together.</summary>
+        public void PlayCollapse() {
+            _cues.PlayOneShot(_collapse, 0.8f);
         }
 
         /// <summary>An organ has settled home. The chime rises with each one, so the puzzle sounds as if it is building towards its end.</summary>

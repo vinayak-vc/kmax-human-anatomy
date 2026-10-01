@@ -24,7 +24,7 @@ namespace ViitorCloud.KmaxAnatomy {
     /// fade, time and log the change; with nobody listening the topic simply opens.</para>
     /// </summary>
     public class AnatomyTopicController : MonoBehaviour, IViewResetHandler {
-        [SerializeField, Tooltip("Topic shown at start, for example heart.")]
+        [SerializeField, Tooltip("Topic shown at start, for example heart. Empty shows none, for an exhibit that opens on the launcher.")]
         private string startTopicId = "heart";
         [SerializeField, Tooltip("Parent of the model. Must sit at the orbit centre, the world origin.")]
         private Transform modelParent;
@@ -43,8 +43,6 @@ namespace ViitorCloud.KmaxAnatomy {
         private ComfortDepthKeeper depthKeeper;
         [SerializeField, Tooltip("Optional. The layer buttons of the body map.")]
         private AnatomyLayerPanel layerPanel;
-        [SerializeField, Tooltip("Id of the body map, the topic every other topic leads back to.")]
-        private string hubTopicId = "body";
         [SerializeField, Tooltip("Optional. The pen's tip, for a topic whose behaviour works with the pen in the room's space.")]
         private StylusTip stylusTip;
 
@@ -65,18 +63,9 @@ namespace ViitorCloud.KmaxAnatomy {
         /// <summary>Raised with a topic's id when the visitor chooses to explore what is picked.</summary>
         public event Action<string> TopicRequested;
 
-        /// <summary>The id of the body map, which the Body map button leads back to.</summary>
-        public string HubTopicId {
-            get { return hubTopicId; }
-        }
-
-        /// <summary>The id of the topic on show, or null before one has loaded.</summary>
+        /// <summary>The id of the topic on show, or null when none is: before one has loaded, or while the launcher is up.</summary>
         public string CurrentTopicId {
             get { return _data != null ? _data.Id : null; }
-        }
-
-        public bool IsOnHub {
-            get { return _data != null && _data.Id == hubTopicId; }
         }
 
         private void OnEnable() {
@@ -128,7 +117,18 @@ namespace ViitorCloud.KmaxAnatomy {
         }
 
         private void Start() {
-            LoadTopic(startTopicId);
+            if (!string.IsNullOrEmpty(startTopicId)) {
+                LoadTopic(startTopicId);
+            }
+        }
+
+        /// <summary>
+        /// Takes the topic off the screen and leaves none: its model, its badges and its behaviour go, and nothing is picked or
+        /// toured. For the launcher to be shown in its place.
+        /// </summary>
+        public void ClearTopic() {
+            UnloadTopic();
+            _data = null;
         }
 
         /// <summary>
@@ -215,38 +215,8 @@ namespace ViitorCloud.KmaxAnatomy {
             }
         }
 
-        /// <summary>
-        /// Starts the tour from the opening state, for an exhibit showing itself with nobody there. Does nothing for a topic
-        /// that has no tour.
-        /// </summary>
-        public void BeginShowcase() {
-            if (_explorer == null) {
-                return;
-            }
-
-            _explorer.Reset();
-            _explorer.StartTour();
-        }
-
-        /// <summary>Moves the showcase on a step, and round to the first step again after the last.</summary>
-        public void AdvanceShowcase() {
-            if (_explorer == null) {
-                return;
-            }
-
-            _explorer.NextStep();
-            if (!_explorer.IsTouring) {
-                _explorer.StartTour();
-            }
-        }
-
         private void AttachToStructure(AnatomyStructure structure) {
-            StructureHighlight highlight = structure.gameObject.AddComponent<StructureHighlight>();
-            AnatomyStructureInfo info = _data.FindStructure(structure.StructureId);
-            if (info != null) {
-                highlight.SetRestOpacity(info.RestOpacity);
-                highlight.SetRecededLook(info.RecededSolidity, info.RecededGlow);
-            }
+            StructureHighlight highlight = StructureHighlight.Attach(structure, _data.FindStructure(structure.StructureId));
 
             // A topic that gives the pen another job has no pointing at its structures at all: the pen's tip works with
             // them, and a pointer that also highlighted and sounded for each one would only echo it.
@@ -502,7 +472,13 @@ namespace ViitorCloud.KmaxAnatomy {
             }
 
             _explorer.ToggleExplode();
-            PlaySelectCue();
+            if (sound != null) {
+                if (_explorer.IsExploded) {
+                    sound.PlayExpand();
+                } else {
+                    sound.PlayCollapse();
+                }
+            }
         }
 
         /// <summary>During a tour, back a step (or out of the tour from the first); otherwise the previous numbered structure.</summary>
@@ -583,7 +559,7 @@ namespace ViitorCloud.KmaxAnatomy {
 
             if (controls != null) {
                 controls.ShowExplore(ExploreTarget() != null);
-                controls.ShowHome(!IsOnHub);
+                controls.ShowHome(true);
                 controls.ShowTour(_explorer.HasTour, _explorer.IsTouring);
                 if (_action != null) {
                     controls.ShowExplode(true, false, _action.ActionLabel, _action.ActionLabel);

@@ -1,10 +1,4 @@
-﻿using System.IO;
-
-using UnityEditor;
-
-using UnityEngine;
-
-using ViitorCloud.KmaxDisplay.Editor;
+﻿using UnityEngine;
 
 namespace ViitorCloud.KmaxAnatomy.Editor {
     /// <summary>
@@ -14,7 +8,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
     /// scene leaves version control alone.
     /// </summary>
     public static class AnatomyMarkerSprites {
-        public const string Folder = KmaxRigBuilder.ModuleRoot + "/Content/Textures";
+        public const string Folder = AnatomySpriteFiles.Folder;
 
         private const string DiscPath = Folder + "/MarkerDisc.png";
         private const string RingPath = Folder + "/MarkerRing.png";
@@ -24,36 +18,12 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
 
         /// <summary>A filled white circle.</summary>
         public static Sprite EnsureDisc() {
-            return Ensure(DiscPath, false);
+            return AnatomySpriteFiles.Ensure(DiscPath, Render(false), Vector4.zero);
         }
 
         /// <summary>A white circle outline.</summary>
         public static Sprite EnsureRing() {
-            return Ensure(RingPath, true);
-        }
-
-        private static Sprite Ensure(string path, bool outlineOnly) {
-            KmaxRigBuilder.EnsureFolder(Folder);
-            byte[] png = Render(outlineOnly);
-            string absolute = AnatomyPaths.ToAbsolute(path);
-            if (!File.Exists(absolute) || !SameBytes(File.ReadAllBytes(absolute), png)) {
-                File.WriteAllBytes(absolute, png);
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
-            }
-
-            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(path);
-            if (importer.textureType != TextureImporterType.Sprite || importer.mipmapEnabled
-                || importer.textureCompression != TextureImporterCompression.Uncompressed) {
-                importer.textureType = TextureImporterType.Sprite;
-                importer.spriteImportMode = SpriteImportMode.Single;
-                importer.alphaIsTransparency = true;
-                importer.mipmapEnabled = false;
-                importer.filterMode = FilterMode.Bilinear;
-                importer.textureCompression = TextureImporterCompression.Uncompressed;
-                importer.SaveAndReimport();
-            }
-
-            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            return AnatomySpriteFiles.Ensure(RingPath, Render(true), Vector4.zero);
         }
 
         /// <summary>White with an anti-aliased circular alpha, one pixel soft at the edge.</summary>
@@ -75,23 +45,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             }
 
             texture.SetPixels(pixels);
-            byte[] png = texture.EncodeToPNG();
-            Object.DestroyImmediate(texture);
-            return png;
-        }
-
-        private static bool SameBytes(byte[] first, byte[] second) {
-            if (first.Length != second.Length) {
-                return false;
-            }
-
-            for (int i = 0; i < first.Length; i++) {
-                if (first[i] != second[i]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return AnatomySpriteFiles.Encode(texture);
         }
     }
 }
