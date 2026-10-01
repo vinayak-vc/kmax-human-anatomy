@@ -1,0 +1,132 @@
+{
+	"id": "brain",
+	"title": "The Brain",
+	"subtitle": "About 1.4 kg of tissue that runs everything you do",
+	"intro": "Point at any region of the brain to see what it does, press Explode to pull the regions apart, or start the tour to follow a message from the eye to the muscles.",
+	"behaviour": "",
+	"displayScale": 1.05,
+	"popOut": 0.02,
+	"maxZoom": 2.2,
+	"homeYaw": -50,
+	"homePitch": 10,
+	"structures": [
+		{
+			"id": "frontal_lobe",
+			"name": "Frontal lobe",
+			"summary": "The front of the brain. It plans, makes decisions, controls voluntary movement and holds much of your personality and speech.",
+			"fact": "It is the last part of the brain to finish maturing, often not until the mid-twenties.",
+			"explodeMm": { "x": 0, "y": 12, "z": -34 }
+		},
+		{
+			"id": "parietal_lobe",
+			"name": "Parietal lobe",
+			"summary": "Behind the frontal lobe. It processes touch, temperature and pain, and works out where your body and other things are in space.",
+			"fact": "It keeps a map of your body, which is how you can touch your nose with your eyes closed.",
+			"explodeMm": { "x": 0, "y": 24, "z": 18 }
+		},
+		{
+			"id": "temporal_lobe",
+			"name": "Temporal lobe",
+			"summary": "Beside the ear. It handles hearing, understanding speech and the forming of new memories.",
+			"fact": "Deep inside it, the hippocampus turns experiences into lasting memories.",
+			"explodeMm": { "x": 0, "y": -16, "z": -6 }
+		},
+		{
+			"id": "occipital_lobe",
+			"name": "Occipital lobe",
+			"summary": "The back of the brain. It receives the signals from the eyes and turns them into the pictures you see.",
+			"fact": "Damage to it can cause blindness even when the eyes themselves are perfectly healthy.",
+			"explodeMm": { "x": 0, "y": -2, "z": 38 }
+		},
+		{
+			"id": "cerebrum",
+			"name": "Inner cerebrum",
+			"summary": "The deep centre of the cerebrum, hidden under the folded lobes. It is mostly white matter: bundles of nerve fibres that link the regions of the brain to one another.",
+			"fact": "White matter is pale because its nerve fibres are wrapped in a fatty insulating coat, myelin.",
+			"explodeMm": { "x": 0, "y": 6, "z": 0 }
+		},
+		{
+			"id": "corpus_callosum",
+			"name": "Corpus callosum",
+			"summary": "A thick band of about 200 million nerve fibres that joins the left and right halves of the brain so they can share what they know.",
+			"fact": "It is the largest bundle of nerve fibres in the brain.",
+			"explodeMm": { "x": 0, "y": 14, "z": -4 }
+		},
+		{
+			"id": "thalamus",
+			"name": "Thalamus",
+			"summary": "A relay station deep in the brain. Nearly every signal from the senses, except smell, passes through it on the way to the outer layer.",
+			"fact": "It also helps regulate sleep and alertness.",
+			"explodeMm": { "x": 0, "y": 3, "z": -12 }
+		},
+		{
+			"id": "optic_chiasma",
+			"name": "Optic chiasma",
+			"summary": "Where the two optic nerves meet. Half of the fibres from each eye cross here, so each side of the brain receives the view from the opposite side of the world.",
+			"fact": "It sits just above the pituitary gland, the body's master hormone gland.",
+			"explodeMm": { "x": 0, "y": -6, "z": -24 }
+		},
+		{
+			"id": "mesencephalon",
+			"name": "Midbrain",
+			"summary": "The top of the brainstem. It helps steer the eyes and passes signals for movement, sight and hearing.",
+			"fact": "Nerve cells here make dopamine, the chemical that is lost in Parkinson's disease.",
+			"explodeMm": { "x": 0, "y": 3, "z": -3 }
+		},
+		{
+			"id": "pons",
+			"name": "Pons",
+			"summary": "The bridge of the brainstem. It links the upper brain to the cerebellum and helps control breathing rhythm, sleep and facial movement.",
+			"fact": "Its name is Latin for bridge.",
+			"explodeMm": { "x": 0, "y": -8, "z": -5 }
+		},
+		{
+			"id": "medulla_oblongata",
+			"name": "Medulla oblongata",
+			"summary": "The lowest part of the brainstem, where the brain meets the spinal cord. It runs the body's automatic essentials: heartbeat, breathing and blood pressure.",
+			"fact": "Most of the nerve fibres that carry movement commands cross from one side to the other here.",
+			"explodeMm": { "x": 0, "y": -18, "z": 4 }
+		},
+		{
+			"id": "cerebellum",
+			"name": "Cerebellum",
+			"summary": "The 'little brain' at the back and underneath. It coordinates movement, balance and timing, so actions are smooth and precise.",
+			"fact": "It holds about four in every five of the brain's nerve cells, in a tenth of its volume.",
+			"explodeMm": { "x": 0, "y": -14, "z": 34 }
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "optic_chiasma" ],
+			"caption": "You see a ball flying towards you. The signals from both eyes meet at the optic chiasma, where half of them cross over."
+		},
+		{
+			"structures": [ "thalamus" ],
+			"caption": "The thalamus, the brain's switchboard for the senses, relays them on."
+		},
+		{
+			"structures": [ "occipital_lobe" ],
+			"caption": "At the back of the head, the occipital lobe turns the signals into a picture."
+		},
+		{
+			"structures": [ "parietal_lobe" ],
+			"caption": "The parietal lobe works out where the ball is, and how fast it is moving."
+		},
+		{
+			"structures": [ "temporal_lobe" ],
+			"caption": "The temporal lobe recognises what it is."
+		},
+		{
+			"structures": [ "frontal_lobe" ],
+			"caption": "The frontal lobe decides to catch it, and sends the order to the muscles."
+		},
+		{
+			"structures": [ "cerebellum" ],
+			"caption": "The cerebellum times and smooths the movement, so your hand arrives at exactly the right moment."
+		},
+		{
+			"structures": [ "mesencephalon", "pons", "medulla_oblongata" ],
+			"caption": "The order travels down through the brainstem, the midbrain, pons and medulla, to the spinal cord and out to the arm."
+		}
+	]
+}

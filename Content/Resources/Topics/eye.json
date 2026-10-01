@@ -1,0 +1,204 @@
+{
+	"id": "eye",
+	"title": "The Eye",
+	"subtitle": "Light goes in, and a picture comes out",
+	"intro": "Point at any part of the eye to see what it does. The eye follows your pen. Start the tour to follow light from the front of the eye to the brain.",
+	"behaviour": "eye",
+	"displayScale": 4,
+	"popOut": 0.03,
+	"maxZoom": 2,
+	"homeYaw": -50,
+	"homePitch": 12,
+	"structures": [
+		{
+			"id": "eye_cornea",
+			"name": "Cornea",
+			"summary": "The clear dome at the front of the eye. It bends incoming light and does about two thirds of the eye's focusing.",
+			"fact": "It has no blood vessels, which is part of why it is clear. It takes its oxygen straight from the air.",
+			"opacity": 0.3,
+			"explodeMm": { "x": 0, "y": 0, "z": -15 }
+		},
+		{
+			"id": "eye_iris",
+			"name": "Iris",
+			"summary": "The coloured ring around the pupil. Its muscles open and close the pupil to let in more or less light.",
+			"fact": "Its pigment gives the eye its colour. The pattern of an iris is as individual as a fingerprint.",
+			"explodeMm": { "x": 0, "y": 0, "z": -9 }
+		},
+		{
+			"id": "eye_lens",
+			"name": "Lens",
+			"summary": "A clear disc behind the pupil. It changes shape to fine-tune the focus: rounder for near things, flatter for far ones.",
+			"fact": "With age the lens stiffens, which is why most people need reading glasses after about 45.",
+			"explodeMm": { "x": 0, "y": 0, "z": -4 }
+		},
+		{
+			"id": "eye_retina",
+			"name": "Retina",
+			"summary": "The light-sensitive layer lining the back of the eye. It turns light into nerve signals.",
+			"fact": "It holds about 120 million rods, for dim light, and 6 million cones, for colour."
+		},
+		{
+			"id": "eye_macula",
+			"name": "Macula",
+			"summary": "A tiny patch at the centre of the retina, packed with cones. It gives the sharpest, most detailed colour vision.",
+			"fact": "When you read, you aim this spot at each word. The rest of the retina sees in far less detail."
+		},
+		{
+			"id": "eye_sclera",
+			"name": "Sclera",
+			"summary": "The white of the eye: a tough outer coat that protects it and holds its shape. The eye muscles pull on it.",
+			"fact": "It covers about five sixths of the eyeball. The clear cornea makes up the rest."
+		},
+		{
+			"id": "eye_dura_matter",
+			"name": "Optic nerve",
+			"summary": "It carries the signals from the retina to the brain along about a million nerve fibres, wrapped in a tough sheath.",
+			"fact": "Where it leaves the eye there are no light sensors, so each eye has a blind spot that the brain fills in."
+		},
+		{
+			"id": "eye_superior_rectus_muscle",
+			"name": "Superior rectus",
+			"summary": "Pulls the eye upward. One of four straight muscles that start at a tendon ring at the back of the eye socket.",
+			"fact": "Six muscles move each eye, and they are among the fastest muscles in the body."
+		},
+		{
+			"id": "eye_inferior_rectus_muscle",
+			"name": "Inferior rectus",
+			"summary": "Pulls the eye downward.",
+			"fact": "Your eyes make about three quick jumps a second when you read or look around."
+		},
+		{
+			"id": "eye_medial_rectus_muscle",
+			"name": "Medial rectus",
+			"summary": "Pulls the eye inward, towards the nose. Both medial recti work together when you look at something close.",
+			"fact": "That is why your eyes cross slightly when you look at your own nose."
+		},
+		{
+			"id": "eye_lateral_rectus_muscle",
+			"name": "Lateral rectus",
+			"summary": "Pulls the eye outward, away from the nose.",
+			"fact": "To look to one side, one eye's lateral rectus and the other eye's medial rectus work together."
+		},
+		{
+			"id": "eye_superior_oblique_muscle",
+			"name": "Superior oblique",
+			"summary": "Turns the eye down and out. Its tendon loops through a small pulley before it reaches the eye.",
+			"fact": "It is the longest and thinnest of the eye muscles."
+		},
+		{
+			"id": "eye_inferior_oblique_muscle",
+			"name": "Inferior oblique",
+			"summary": "Turns the eye up and out. It is the only eye muscle that starts at the front of the eye socket.",
+			"fact": "Together the two obliques stop the eye tilting when you tip your head."
+		},
+		{
+			"id": "eye_levator_palpae_superioris_m",
+			"name": "Levator palpebrae",
+			"summary": "Lifts the upper eyelid, keeping the eye open. It is not one of the six muscles that turn the eye.",
+			"fact": "When it is weak the eyelid droops, a condition called ptosis."
+		},
+		{
+			"id": "eye_lacrimal_gland",
+			"name": "Lacrimal gland",
+			"summary": "Makes the watery part of tears. It sits above the outer corner of the eye.",
+			"fact": "Each blink spreads a fresh film of tears over the cornea, about every four seconds."
+		},
+		{
+			"id": "eye_lacrimal_sac",
+			"name": "Lacrimal sac",
+			"summary": "Collects tears after they drain through the tiny canals at the inner corner of the eye, and passes them down to the nose.",
+			"fact": "That is why your nose runs when you cry."
+		},
+		{
+			"id": "eye_ora_serrata",
+			"name": "Ora serrata",
+			"summary": "The jagged edge where the retina stops, near the front of the eye.",
+			"fact": "Its name is Latin for serrated edge.",
+			"explodeMm": { "x": 0, "y": 0, "z": -2 },
+			"unnumbered": true
+		},
+		{
+			"id": "eye_trochlea",
+			"name": "Trochlea",
+			"summary": "A small ring of cartilage that works as a pulley for the tendon of the superior oblique.",
+			"fact": "Trochlea is Latin for pulley.",
+			"unnumbered": true
+		},
+		{
+			"id": "eye_annular_tendon",
+			"name": "Annular tendon",
+			"summary": "A ring of tendon at the back of the eye socket where the four straight muscles begin. The optic nerve passes through it.",
+			"fact": "It is also called the common tendinous ring.",
+			"unnumbered": true
+		},
+		{
+			"id": "eye_lacrimal_canal",
+			"name": "Lacrimal canal",
+			"summary": "A tiny channel in the inner corner of the eyelid that drains tears towards the lacrimal sac.",
+			"fact": "There is one in the upper lid and one in the lower.",
+			"unnumbered": true
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "eye_cornea" ],
+			"caption": "Light enters the eye through the cornea, the clear dome at the front, which bends it towards a focus.",
+			"exploded": "together",
+			"setsView": true,
+			"yaw": -70,
+			"pitch": 8,
+			"zoom": 1.7
+		},
+		{
+			"structures": [ "eye_iris" ],
+			"caption": "The iris opens and closes the pupil to let in the right amount of light.",
+			"setsView": true,
+			"yaw": -12,
+			"pitch": 4,
+			"zoom": 1.3
+		},
+		{
+			"structures": [ "eye_lens" ],
+			"caption": "The lens then fine-tunes the focus, rounder for near things and flatter for far ones.",
+			"setsView": true,
+			"yaw": -70,
+			"pitch": 8,
+			"zoom": 1.7
+		},
+		{
+			"structures": [ "eye_retina" ],
+			"caption": "The light lands on the retina, where millions of cells turn it into nerve signals.",
+			"zoom": 1.7
+		},
+		{
+			"structures": [ "eye_macula" ],
+			"caption": "At the centre, the macula gives the sharpest, most detailed vision.",
+			"zoom": 1.7
+		},
+		{
+			"structures": [ "eye_dura_matter" ],
+			"caption": "The optic nerve carries the signals away to the brain, which builds the picture you see.",
+			"setsView": true,
+			"yaw": -70,
+			"pitch": 10,
+			"zoom": 1
+		},
+		{
+			"structures": [ "eye_superior_rectus_muscle", "eye_inferior_rectus_muscle", "eye_medial_rectus_muscle", "eye_lateral_rectus_muscle", "eye_superior_oblique_muscle", "eye_inferior_oblique_muscle" ],
+			"caption": "Six muscles steer the eye. Watch each one light up as it pulls.",
+			"setsView": true,
+			"yaw": -35,
+			"pitch": 14,
+			"zoom": 1
+		},
+		{
+			"structures": [ "eye_lacrimal_gland", "eye_lacrimal_sac", "eye_lacrimal_canal" ],
+			"caption": "Tears from the lacrimal gland wash the front of the eye, then drain through tiny canals and the lacrimal sac to the nose.",
+			"setsView": true,
+			"yaw": -15,
+			"pitch": 0,
+			"zoom": 1
+		}
+	]
+}

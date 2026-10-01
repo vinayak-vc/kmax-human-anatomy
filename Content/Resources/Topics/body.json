@@ -1,0 +1,142 @@
+{
+	"id": "body",
+	"title": "The Human Body",
+	"subtitle": "Six places to explore",
+	"intro": "Point at a glowing organ to see what it does. Press Explore, or click it again, to look inside. The buttons on the left show and hide the skeleton, muscles, organs, vessels and nerves.",
+	"behaviour": "body",
+	"displayScale": 0.28,
+	"popOut": 0.04,
+	"maxZoom": 3,
+	"homeYaw": 0,
+	"homePitch": 4,
+	"links": [
+		{
+			"label": "Put the organs back",
+			"topic": "organs"
+		},
+		{
+			"label": "Scan the body",
+			"topic": "scan"
+		}
+	],
+	"structures": [
+		{
+			"id": "brain",
+			"name": "Brain",
+			"summary": "The control centre of the body. It handles thought, memory, feeling and movement, and makes sense of the signals that arrive from every sense.",
+			"fact": "It weighs about 1.4 kilograms and uses about a fifth of the body's energy.",
+			"topic": "brain"
+		},
+		{
+			"id": "eye_left",
+			"name": "Eye",
+			"summary": "The eye turns light into nerve signals. The lens focuses an image on the retina at the back, and the signals travel to the brain along the optic nerve.",
+			"fact": "Six small muscles steer each eye.",
+			"topic": "eye"
+		},
+		{
+			"id": "ear_left",
+			"name": "Ear",
+			"summary": "The ear catches sound and turns it into nerve signals. The inner ear also helps you keep your balance.",
+			"fact": "The three tiny bones of the middle ear are the smallest in the body.",
+			"topic": "ear"
+		},
+		{
+			"id": "face",
+			"name": "Skull, jaw and face",
+			"summary": "The jaw is the only part of the skull that moves, and it is worked by some of the strongest muscles in the body. Many smaller muscles shape the face.",
+			"fact": "Adults have 32 teeth.",
+			"topic": "skull"
+		},
+		{
+			"id": "heart",
+			"name": "Heart",
+			"summary": "A muscular pump about the size of a fist. It beats around once a second, sending blood to the lungs and round the whole body.",
+			"fact": "It beats about 100,000 times a day.",
+			"topic": "heart"
+		},
+		{
+			"id": "lung_left",
+			"name": "Lungs",
+			"summary": "The lungs bring oxygen into the blood and take carbon dioxide out. The ribs and the diaphragm move to draw air in and push it out.",
+			"fact": "An adult breathes about 20,000 times a day.",
+			"opacity": 0.45,
+			"topic": "breathing"
+		},
+		{
+			"id": "eye_right",
+			"name": "Eye",
+			"summary": "The eye turns light into nerve signals. The lens focuses an image on the retina at the back, and the signals travel to the brain along the optic nerve.",
+			"fact": "Six small muscles steer each eye.",
+			"unnumbered": true,
+			"topic": "eye"
+		},
+		{
+			"id": "ear_right",
+			"name": "Ear",
+			"summary": "The ear catches sound and turns it into nerve signals. The inner ear also helps you keep your balance.",
+			"fact": "The three tiny bones of the middle ear are the smallest in the body.",
+			"unnumbered": true,
+			"topic": "ear"
+		},
+		{
+			"id": "lung_right",
+			"name": "Lungs",
+			"summary": "The lungs bring oxygen into the blood and take carbon dioxide out. The ribs and the diaphragm move to draw air in and push it out.",
+			"fact": "An adult breathes about 20,000 times a day.",
+			"opacity": 0.45,
+			"unnumbered": true,
+			"topic": "breathing"
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "brain" ],
+			"caption": "The brain controls everything you think, feel and do. Even while you sleep it never stops working.",
+			"setsView": true,
+			"yaw": -25,
+			"pitch": 8,
+			"zoom": 1.6
+		},
+		{
+			"structures": [ "eye_left", "eye_right" ],
+			"caption": "The eyes turn light into signals, and the brain turns the signals into sight.",
+			"setsView": true,
+			"yaw": 0,
+			"pitch": 4,
+			"zoom": 2.2
+		},
+		{
+			"structures": [ "ear_left", "ear_right" ],
+			"caption": "The ears catch sound and keep you balanced. The part that hears lies deep inside the skull.",
+			"setsView": true,
+			"yaw": 35,
+			"pitch": 4,
+			"zoom": 1.8
+		},
+		{
+			"structures": [ "face" ],
+			"caption": "The jaw is the only part of the skull that moves. It lets you chew, talk and smile.",
+			"setsView": true,
+			"yaw": -30,
+			"pitch": 2,
+			"zoom": 2
+		},
+		{
+			"structures": [ "heart" ],
+			"caption": "The heart pumps blood to the lungs and round the body, about once every second.",
+			"setsView": true,
+			"yaw": 15,
+			"pitch": 6,
+			"zoom": 1.8
+		},
+		{
+			"structures": [ "lung_left", "lung_right" ],
+			"caption": "The lungs take oxygen from the air into the blood. The ribs and the diaphragm move to draw each breath.",
+			"setsView": true,
+			"yaw": -15,
+			"pitch": 4,
+			"zoom": 1.5
+		}
+	]
+}

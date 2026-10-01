@@ -104,3 +104,10 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# DOSCH 3D Human Anatomy - Pending DOSCH Approval.
+# The raw pack and everything generated from it (meshes, materials, textures, prefabs) stay out of git.
+# Regenerate with the Kmax > Anatomy menu once the pack is placed in Source~.
+/Source~/
+/Generated/
+/Generated.meta

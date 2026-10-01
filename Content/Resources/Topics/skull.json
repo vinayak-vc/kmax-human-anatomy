@@ -1,0 +1,226 @@
+{
+	"id": "skull",
+	"title": "Skull, Jaw and Face",
+	"subtitle": "A hinge, thirty-two teeth and the muscles that chew and express",
+	"intro": "Point at any part to see what it does. The jaw opens and closes, and the muscles that do the work light up. Start the tour to meet the chewing muscles and the muscles of expression.",
+	"behaviour": "jaw",
+	"displayScale": 0.8,
+	"popOut": 0.03,
+	"maxZoom": 2.4,
+	"homeYaw": -30,
+	"homePitch": 6,
+	"structures": [
+		{
+			"id": "skull",
+			"name": "Skull",
+			"summary": "The bones that shelter the brain and give the face its shape. Apart from the jaw, they are locked together and do not move.",
+			"fact": "The joints between them are zigzag seams called sutures.",
+			"recededSolidity": 0.4,
+			"recededGlow": 0.35
+		},
+		{
+			"id": "mandible",
+			"name": "Jaw bone",
+			"summary": "The lower jaw, the only bone of the skull that moves. It hinges on the skull just in front of each ear.",
+			"fact": "It is the largest and strongest bone of the face.",
+			"recededSolidity": 0.5,
+			"recededGlow": 0.35
+		},
+		{
+			"id": "teeth_upper",
+			"name": "Upper teeth",
+			"summary": "The teeth of the upper jaw. They are fixed to the skull, and bite against the lower teeth.",
+			"fact": "Adults have 32 teeth, including four wisdom teeth.",
+			"recededSolidity": 0.5,
+			"recededGlow": 0.35
+		},
+		{
+			"id": "teeth_lower",
+			"name": "Lower teeth",
+			"summary": "The teeth of the lower jaw. They move with the jaw bone and meet the upper teeth when the mouth closes.",
+			"fact": "Tooth enamel is the hardest substance in the body.",
+			"recededSolidity": 0.5,
+			"recededGlow": 0.35
+		},
+		{
+			"id": "masseter_muscle",
+			"name": "Masseter",
+			"summary": "A thick muscle from the cheekbone to the corner of the jaw. It closes the mouth and clenches the teeth.",
+			"fact": "For its size it is one of the strongest muscles in the body."
+		},
+		{
+			"id": "medial_pterygoid_muscle",
+			"name": "Medial pterygoid",
+			"summary": "A muscle on the inside of the jaw. It works with the masseter to close the mouth and to grind the teeth from side to side.",
+			"fact": "Together with the masseter it forms a sling that holds the corner of the jaw."
+		},
+		{
+			"id": "lateral_pterygoid_muscle",
+			"name": "Lateral pterygoid",
+			"summary": "It pulls the jaw forward and helps to open the mouth. Working on one side it moves the jaw sideways.",
+			"fact": "It is the only chewing muscle that opens the jaw."
+		},
+		{
+			"id": "digastric_muscle",
+			"name": "Digastric",
+			"summary": "A muscle in two parts, joined by a tendon, running from behind the ear to the chin. It pulls the jaw down and open.",
+			"fact": "Digastric means two bellies."
+		},
+		{
+			"id": "orbicularis_muscle",
+			"name": "Orbicularis oris",
+			"summary": "A ring of muscle round the mouth. It closes and purses the lips, in a kiss, a whistle and speech.",
+			"fact": "Many of the other face muscles blend into it."
+		},
+		{
+			"id": "orbicularis_oculi_muscle",
+			"name": "Orbicularis oculi",
+			"summary": "The ring of muscle round each eye. It closes the eyelids, in a blink or a squint.",
+			"fact": "You blink about 15 to 20 times a minute."
+		},
+		{
+			"id": "zygomaticus_major_muscle",
+			"name": "Zygomaticus major",
+			"summary": "It runs from the cheekbone to the corner of the mouth and lifts it, when you smile.",
+			"fact": "A genuine smile uses the muscle round the eyes as well."
+		},
+		{
+			"id": "buccinator_muscle",
+			"name": "Buccinator",
+			"summary": "The cheek muscle. It holds food between the teeth as you chew, and lets you blow out your cheeks.",
+			"fact": "Its name comes from the Latin for trumpeter."
+		},
+		{
+			"id": "depressor_anguli_oris_muscle",
+			"name": "Depressor anguli oris",
+			"summary": "It pulls the corners of the mouth down, in a frown.",
+			"fact": "Its name means the muscle that lowers the angle of the mouth."
+		},
+		{
+			"id": "mentalis_muscle",
+			"name": "Mentalis",
+			"summary": "It lifts the chin and pushes the lower lip out, as in a pout.",
+			"fact": "It is what wrinkles the skin of the chin."
+		},
+		{
+			"id": "risorius_muscle",
+			"name": "Risorius",
+			"summary": "It pulls the corner of the mouth sideways, in a grin.",
+			"fact": "Risorius comes from the Latin for laughter."
+		},
+		{
+			"id": "mylohyoid_muscle",
+			"name": "Mylohyoid",
+			"summary": "A sheet of muscle that forms the floor of the mouth. It lifts the tongue to swallow and helps to lower the jaw.",
+			"fact": "It is what you feel tighten under the chin when you swallow."
+		},
+		{
+			"id": "zygomaticus_minor_muscle",
+			"name": "Zygomaticus minor",
+			"summary": "A slender muscle that lifts the upper lip, working alongside the zygomaticus major.",
+			"fact": "Some people have no zygomaticus minor at all.",
+			"unnumbered": true
+		},
+		{
+			"id": "levatator_labii_superioris_musc",
+			"name": "Levator labii superioris",
+			"summary": "It lifts the upper lip, as in a sneer.",
+			"fact": "Its name means the lifter of the upper lip.",
+			"unnumbered": true
+		},
+		{
+			"id": "levatator_labii_superioris_alae",
+			"name": "Levator labii superioris alaeque nasi",
+			"summary": "It lifts the upper lip and flares the nostril.",
+			"fact": "It has the longest name of any muscle of the face.",
+			"unnumbered": true
+		},
+		{
+			"id": "levatator_anguli_oris_muscle",
+			"name": "Levator anguli oris",
+			"summary": "It lifts the corner of the mouth, helping to smile.",
+			"fact": "It lies deeper than the other muscles that lift the lip.",
+			"unnumbered": true
+		},
+		{
+			"id": "depressor_labii_inferioris_musc",
+			"name": "Depressor labii inferioris",
+			"summary": "It pulls the lower lip down and a little out.",
+			"fact": "It is one of the muscles that shape the mouth for speech.",
+			"unnumbered": true
+		},
+		{
+			"id": "geniohyoid_muscle",
+			"name": "Geniohyoid",
+			"summary": "A short muscle from the chin to the hyoid bone. It draws the hyoid forward and helps to lower the jaw.",
+			"fact": "It lies just above the mylohyoid.",
+			"unnumbered": true
+		},
+		{
+			"id": "stylohyoid_muscle",
+			"name": "Stylohyoid",
+			"summary": "A slim muscle from the skull to the hyoid bone. It pulls the hyoid up and back when you swallow.",
+			"fact": "It runs alongside the back of the digastric.",
+			"unnumbered": true
+		},
+		{
+			"id": "hyoglossus_muscle",
+			"name": "Hyoglossus",
+			"summary": "A muscle that pulls the tongue down and back.",
+			"fact": "It is one of the muscles that let the tongue move in every direction.",
+			"unnumbered": true
+		},
+		{
+			"id": "nasal_cavity",
+			"name": "Nasal cavity",
+			"summary": "The space behind the nose, where the air you breathe in is warmed, moistened and filtered.",
+			"fact": "It is lined with tiny hairs and a layer of mucus that trap dust.",
+			"unnumbered": true
+		},
+		{
+			"id": "nasal_cartilage",
+			"name": "Nasal cartilage",
+			"summary": "The flexible cartilage that shapes the tip and sides of the nose.",
+			"fact": "It is why the end of the nose is soft and the top is hard.",
+			"unnumbered": true
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "skull" ],
+			"caption": "The skull shelters the brain and shapes the face. Apart from the jaw, its bones are locked together.",
+			"setsView": true,
+			"yaw": -30,
+			"pitch": 6,
+			"zoom": 1
+		},
+		{
+			"structures": [ "mandible", "teeth_lower" ],
+			"caption": "Only the lower jaw moves. It hinges on the skull just in front of each ear."
+		},
+		{
+			"structures": [ "lateral_pterygoid_muscle", "digastric_muscle", "mylohyoid_muscle" ],
+			"caption": "To open the mouth, these muscles pull the jaw down and forward.",
+			"setsView": true,
+			"yaw": -55,
+			"pitch": 4,
+			"zoom": 1.15
+		},
+		{
+			"structures": [ "masseter_muscle", "medial_pterygoid_muscle" ],
+			"caption": "To close it, the masseter and the medial pterygoid lift the jaw, with a force that can crack a nut."
+		},
+		{
+			"structures": [ "zygomaticus_major_muscle", "risorius_muscle", "depressor_anguli_oris_muscle", "mentalis_muscle" ],
+			"caption": "The muscles of expression pull on the lips. One lifts the corner of the mouth in a smile, another pulls it down.",
+			"setsView": true,
+			"yaw": -20,
+			"pitch": 4,
+			"zoom": 1.15
+		},
+		{
+			"structures": [ "orbicularis_muscle", "orbicularis_oculi_muscle", "buccinator_muscle" ],
+			"caption": "Rings of muscle close the lips and the eyes, and the cheeks hold food between the teeth as you chew."
+		}
+	]
+}

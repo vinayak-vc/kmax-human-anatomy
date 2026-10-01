@@ -1,0 +1,163 @@
+{
+	"id": "breathing",
+	"title": "Breathing",
+	"subtitle": "About twelve times a minute, all day, without a thought",
+	"intro": "Point at any part to see what it does. Watch the chest breathe, or start the tour to follow one breath from the throat to the lungs and back.",
+	"behaviour": "breathing",
+	"displayScale": 0.38,
+	"popOut": 0.03,
+	"maxZoom": 2.4,
+	"homeYaw": -15,
+	"homePitch": 6,
+	"structures": [
+		{
+			"id": "epiglottis",
+			"name": "Epiglottis",
+			"summary": "A leaf-shaped flap at the back of the tongue. It folds down over the windpipe when you swallow, so food goes to the stomach and not the lungs.",
+			"fact": "When something goes down the wrong way, the flap has missed, and a cough pushes it back out."
+		},
+		{
+			"id": "thyroid_cartilage",
+			"name": "Thyroid cartilage",
+			"summary": "The largest cartilage of the voice box. It shields the vocal cords, and in many men it forms the bump called the Adam's apple.",
+			"fact": "Its name comes from the Greek for shield."
+		},
+		{
+			"id": "vocal_process",
+			"name": "Vocal process",
+			"summary": "A small projection of cartilage in the voice box. The vocal cords attach to it, and moving it tightens or slackens them to change your pitch.",
+			"fact": "Your voice is air from the lungs making the cords vibrate."
+		},
+		{
+			"id": "bronchial_tubes",
+			"name": "Windpipe and bronchi",
+			"summary": "The windpipe, about 12 cm long, and the tubes that branch from it into each lung. Rings of cartilage hold it open.",
+			"fact": "The branches divide about 23 times, ending in some 480 million tiny air sacs."
+		},
+		{
+			"id": "lungs_2",
+			"name": "Right lung",
+			"summary": "It has three lobes and is a little bigger than the left. Air reaches the tiny sacs at its ends, where oxygen passes into the blood.",
+			"fact": "Lungs have no muscle of their own. The chest and the diaphragm pull them open.",
+			"opacity": 0.45
+		},
+		{
+			"id": "lungs",
+			"name": "Left lung",
+			"summary": "It has two lobes, and a notch in its edge makes room for the heart.",
+			"fact": "Together the lungs hold about six litres when full, yet a normal breath moves only about half a litre.",
+			"opacity": 0.45
+		},
+		{
+			"id": "diaphragm",
+			"name": "Diaphragm",
+			"summary": "The main muscle of breathing, a dome under the lungs. It tightens and flattens to pull air in, and relaxes to let it out.",
+			"fact": "A hiccup is the diaphragm twitching suddenly."
+		},
+		{
+			"id": "ribs",
+			"name": "Ribs",
+			"summary": "Twelve pairs of curved bones that protect the heart and lungs. They swing up and out as you breathe in.",
+			"fact": "The lowest two pairs are called floating ribs because they do not reach the front.",
+			"opacity": 0.5,
+			"recededSolidity": 0.35,
+			"recededGlow": 0.25
+		},
+		{
+			"id": "rib_cartilage",
+			"name": "Costal cartilage",
+			"summary": "Flexible cartilage that joins most of the ribs to the breastbone, letting the chest spring open and back.",
+			"fact": "It slowly turns to bone with age, which makes the chest a little stiffer.",
+			"opacity": 0.5,
+			"recededSolidity": 0.35,
+			"recededGlow": 0.25
+		},
+		{
+			"id": "sternum",
+			"name": "Breastbone",
+			"summary": "The flat bone at the front of the chest. It moves up and forward a little with each breath.",
+			"fact": "In CPR the chest is pressed here, to squeeze the heart against the spine.",
+			"opacity": 0.55,
+			"recededSolidity": 0.35,
+			"recededGlow": 0.25
+		},
+		{
+			"id": "hyoid_bone",
+			"name": "Hyoid bone",
+			"summary": "A small U-shaped bone under the tongue that holds the tongue and the voice box in place.",
+			"fact": "It is the only bone in the body that does not join another bone.",
+			"unnumbered": true
+		},
+		{
+			"id": "cricoid_cartilage",
+			"name": "Cricoid cartilage",
+			"summary": "The ring of cartilage at the top of the windpipe, just below the thyroid cartilage.",
+			"fact": "It is the only complete ring in the airway.",
+			"unnumbered": true
+		},
+		{
+			"id": "thyrohyoid_membrane",
+			"name": "Thyrohyoid membrane",
+			"summary": "A sheet of tissue joining the hyoid bone to the thyroid cartilage.",
+			"fact": "Nerves and blood vessels pass through it to the voice box.",
+			"unnumbered": true
+		},
+		{
+			"id": "cricothyroid_ligament",
+			"name": "Cricothyroid ligament",
+			"summary": "A tough band linking the thyroid and cricoid cartilages.",
+			"fact": "Doctors can make an emergency airway through it.",
+			"unnumbered": true
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "epiglottis" ],
+			"caption": "Air comes in through the nose or mouth and passes the epiglottis, the flap that keeps food out of the airway.",
+			"setsView": true,
+			"yaw": -25,
+			"pitch": 8,
+			"zoom": 1.6
+		},
+		{
+			"structures": [ "thyroid_cartilage", "vocal_process" ],
+			"caption": "It flows through the voice box, where air passing the vocal cords makes your voice."
+		},
+		{
+			"structures": [ "bronchial_tubes" ],
+			"caption": "Down the windpipe it goes, which divides into two branches, one for each lung.",
+			"setsView": true,
+			"yaw": -15,
+			"pitch": 6,
+			"zoom": 1
+		},
+		{
+			"structures": [ "lungs_2", "lungs" ],
+			"caption": "The branches divide again and again, ending in about 480 million tiny air sacs where oxygen passes into the blood."
+		},
+		{
+			"structures": [ "diaphragm" ],
+			"caption": "To draw a breath in, the diaphragm tightens and flattens, pulling the lungs down.",
+			"setsView": true,
+			"yaw": -45,
+			"pitch": 12,
+			"zoom": 1
+		},
+		{
+			"structures": [ "ribs", "rib_cartilage", "sternum" ],
+			"caption": "At the same time the ribs swing up and out and the breastbone lifts, widening the chest.",
+			"setsView": true,
+			"yaw": -60,
+			"pitch": 8,
+			"zoom": 1
+		},
+		{
+			"structures": [ "lungs_2", "lungs" ],
+			"caption": "The lungs stretch to fill the space, and air rushes in. Then the muscles relax, the chest springs back, and the air flows out.",
+			"setsView": true,
+			"yaw": -15,
+			"pitch": 6,
+			"zoom": 1
+		}
+	]
+}

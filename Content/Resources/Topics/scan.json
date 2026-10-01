@@ -1,0 +1,128 @@
+{
+	"id": "scan",
+	"title": "Scan the body",
+	"subtitle": "Dig through the layers with the pen",
+	"intro": "Hold the pen over the body and push it in. Everything nearer than the tip is cut away, so you can see what lies deeper.",
+	"behaviour": "scan",
+	"displayScale": 0.3,
+	"popOut": 0.04,
+	"maxZoom": 1,
+	"homeYaw": 0,
+	"homePitch": 0,
+	"stationary": true,
+	"selectable": false,
+	"structures": [
+		{
+			"id": "heart",
+			"name": "Heart",
+			"summary": "A muscular pump about the size of a fist. It sits between the lungs, a little to the left, and sends blood round the body.",
+			"fact": "It beats about 100,000 times a day.",
+			"unnumbered": true
+		},
+		{
+			"id": "lung_left",
+			"name": "Left lung",
+			"summary": "Smaller than the right lung, to leave room for the heart.",
+			"fact": "The left lung has two lobes; the right has three.",
+			"unnumbered": true
+		},
+		{
+			"id": "lung_right",
+			"name": "Right lung",
+			"summary": "The larger lung. It sits on the right of the chest, with the liver just below it.",
+			"fact": "Together the lungs hold hundreds of millions of tiny air sacs.",
+			"unnumbered": true
+		},
+		{
+			"id": "windpipe",
+			"name": "Windpipe",
+			"summary": "The windpipe carries air down from the throat, then splits into two airways, one to each lung.",
+			"fact": "It is held open by rings of cartilage.",
+			"unnumbered": true
+		},
+		{
+			"id": "esophagus",
+			"name": "Food pipe",
+			"summary": "The tube that carries food from the throat to the stomach. Muscles squeeze it along in a few seconds.",
+			"fact": "You can swallow even while standing on your head.",
+			"unnumbered": true
+		},
+		{
+			"id": "diaphragm",
+			"name": "Diaphragm",
+			"summary": "The main muscle of breathing. It lies like a dome under the lungs and flattens as you breathe in, drawing air into them.",
+			"fact": "Hiccups are the diaphragm twitching.",
+			"unnumbered": true
+		},
+		{
+			"id": "liver",
+			"name": "Liver",
+			"summary": "The largest organ inside the body. It lies on the right, under the ribs, and cleans the blood, makes bile and stores energy.",
+			"fact": "It can regrow after part of it is removed.",
+			"unnumbered": true
+		},
+		{
+			"id": "gall_bladder",
+			"name": "Gall bladder",
+			"summary": "A small pouch under the liver that stores bile, a green liquid that helps to digest fat.",
+			"fact": "It is about the size of a small pear.",
+			"unnumbered": true
+		},
+		{
+			"id": "stomach",
+			"name": "Stomach",
+			"summary": "A stretchy bag on the left that mixes food with acid and starts to break it down.",
+			"fact": "An adult stomach can hold about a litre of food and drink.",
+			"unnumbered": true
+		},
+		{
+			"id": "spleen",
+			"name": "Spleen",
+			"summary": "A soft organ on the left, behind the stomach. It filters old blood cells and helps to fight infection.",
+			"fact": "It is about the size of a fist.",
+			"unnumbered": true
+		},
+		{
+			"id": "pancreas",
+			"name": "Pancreas",
+			"summary": "A long gland behind the stomach. It makes juices that digest food, and the insulin that controls the sugar in your blood.",
+			"fact": "It is about 15 centimetres long.",
+			"unnumbered": true
+		},
+		{
+			"id": "kidney_left",
+			"name": "Left kidney",
+			"summary": "One of two bean-shaped filters at the back, either side of the spine. It cleans the blood and makes urine.",
+			"fact": "Between them, the kidneys filter all of your blood many times a day.",
+			"unnumbered": true
+		},
+		{
+			"id": "kidney_right",
+			"name": "Right kidney",
+			"summary": "Its twin on the right. The liver pushes it a little lower than the left one.",
+			"fact": "You can live a healthy life with just one kidney.",
+			"unnumbered": true
+		},
+		{
+			"id": "small_intestine",
+			"name": "Small intestine",
+			"summary": "A long coiled tube where most of the food you eat is broken down and absorbed into the blood.",
+			"fact": "It is about six metres long, coiled up to fit.",
+			"unnumbered": true
+		},
+		{
+			"id": "large_intestine",
+			"name": "Large intestine",
+			"summary": "It frames the small intestine. It absorbs water and turns what is left into waste.",
+			"fact": "It is about one and a half metres long.",
+			"unnumbered": true
+		},
+		{
+			"id": "bladder",
+			"name": "Bladder",
+			"summary": "A stretchy bag that stores urine until you go to the toilet.",
+			"fact": "It can hold about half a litre.",
+			"unnumbered": true
+		}
+	]
+}

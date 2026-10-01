@@ -1,0 +1,87 @@
+{
+	"id": "organs",
+	"title": "Put the organs back",
+	"subtitle": "Ten organs are out of place",
+	"intro": "Touch an organ with the pen, hold the button and carry it to the glowing outline where it belongs.",
+	"behaviour": "organs",
+	"displayScale": 0.3,
+	"popOut": 0.04,
+	"maxZoom": 1,
+	"homeYaw": 0,
+	"homePitch": 0,
+	"resetLabel": "Start again",
+	"stationary": true,
+	"selectable": false,
+	"structures": [
+		{
+			"id": "heart",
+			"name": "Heart",
+			"summary": "A muscular pump about the size of a fist. It sits between the lungs, a little to the left, and sends blood round the body.",
+			"fact": "It beats about 100,000 times a day.",
+			"unnumbered": true
+		},
+		{
+			"id": "lung_left",
+			"name": "Left lung",
+			"summary": "Smaller than the right lung, to leave room for the heart.",
+			"fact": "The left lung has two lobes; the right has three.",
+			"unnumbered": true
+		},
+		{
+			"id": "lung_right",
+			"name": "Right lung",
+			"summary": "The larger lung. It sits on the right of the chest, with the liver just below it.",
+			"fact": "Together the lungs hold hundreds of millions of tiny air sacs.",
+			"unnumbered": true
+		},
+		{
+			"id": "liver",
+			"name": "Liver",
+			"summary": "The largest organ inside the body. It lies on the right, under the ribs, and cleans the blood, makes bile and stores energy.",
+			"fact": "It can regrow after part of it is removed.",
+			"unnumbered": true
+		},
+		{
+			"id": "stomach",
+			"name": "Stomach",
+			"summary": "A stretchy bag on the left that mixes food with acid and starts to break it down.",
+			"fact": "An adult stomach can hold about a litre of food and drink.",
+			"unnumbered": true
+		},
+		{
+			"id": "spleen",
+			"name": "Spleen",
+			"summary": "A soft organ on the left, behind the stomach. It filters old blood cells and helps to fight infection.",
+			"fact": "It is about the size of a fist.",
+			"unnumbered": true
+		},
+		{
+			"id": "kidney_left",
+			"name": "Left kidney",
+			"summary": "One of two bean-shaped filters at the back, either side of the spine. It cleans the blood and makes urine.",
+			"fact": "Between them, the kidneys filter all of your blood many times a day.",
+			"unnumbered": true
+		},
+		{
+			"id": "kidney_right",
+			"name": "Right kidney",
+			"summary": "Its twin on the right. The liver pushes it a little lower than the left one.",
+			"fact": "You can live a healthy life with just one kidney.",
+			"unnumbered": true
+		},
+		{
+			"id": "small_intestine",
+			"name": "Small intestine",
+			"summary": "A long coiled tube where most of the food you eat is broken down and absorbed into the blood.",
+			"fact": "It is about six metres long, coiled up to fit.",
+			"unnumbered": true
+		},
+		{
+			"id": "large_intestine",
+			"name": "Large intestine",
+			"summary": "It frames the small intestine. It absorbs water and turns what is left into waste.",
+			"fact": "It is about one and a half metres long.",
+			"unnumbered": true
+		}
+	]
+}

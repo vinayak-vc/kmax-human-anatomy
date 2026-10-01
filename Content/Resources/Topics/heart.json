@@ -1,0 +1,102 @@
+{
+	"id": "heart",
+	"title": "The Heart",
+	"subtitle": "A pump about the size of your fist",
+	"intro": "Point at any part of the heart to see what it does, or start the tour to follow one journey of blood around the body.",
+	"behaviour": "heartbeat",
+	"displayScale": 1.15,
+	"popOut": 0.03,
+	"maxZoom": 2.4,
+	"homeYaw": 0,
+	"homePitch": 0,
+	"structures": [
+		{
+			"id": "superior_vena_cava",
+			"name": "Superior vena cava",
+			"summary": "The large vein that brings oxygen-poor blood back from the head, neck and arms to the right atrium.",
+			"fact": "A matching vein, the inferior vena cava, does the same job for the lower body."
+		},
+		{
+			"id": "right_atrium",
+			"name": "Right atrium",
+			"summary": "The upper right chamber. It receives oxygen-poor blood from the body and passes it down to the right ventricle.",
+			"fact": "A small cluster of cells in its wall, the sinoatrial node, sets the rhythm of every heartbeat."
+		},
+		{
+			"id": "right_ventricle",
+			"name": "Right ventricle",
+			"summary": "The lower right chamber. It pumps oxygen-poor blood to the lungs through the pulmonary trunk.",
+			"fact": "It only has to reach the nearby lungs, so its wall is thinner than the left ventricle's."
+		},
+		{
+			"id": "pulmonary_trunk",
+			"name": "Pulmonary trunk",
+			"summary": "The large artery leaving the right ventricle. It divides into the left and right pulmonary arteries.",
+			"fact": ""
+		},
+		{
+			"id": "pulmonary_arteries",
+			"name": "Pulmonary arteries",
+			"summary": "They carry oxygen-poor blood from the heart to the lungs, where it picks up oxygen.",
+			"fact": "Unusually for arteries, they carry blood that is low in oxygen."
+		},
+		{
+			"id": "pulmonary_veins",
+			"name": "Pulmonary veins",
+			"summary": "They bring freshly oxygenated blood from the lungs back to the left atrium.",
+			"fact": "Unusually for veins, they carry blood that is rich in oxygen."
+		},
+		{
+			"id": "left_atrium",
+			"name": "Left atrium",
+			"summary": "The upper left chamber. It collects oxygen-rich blood from the lungs and passes it down to the left ventricle.",
+			"fact": ""
+		},
+		{
+			"id": "left_ventricle",
+			"name": "Left ventricle",
+			"summary": "The lower left chamber and the strongest part of the heart. It pumps oxygen-rich blood out to the whole body.",
+			"fact": "Its muscular wall is much thicker than the right ventricle's, because it must push blood all the way round the body."
+		},
+		{
+			"id": "ascending_aorta",
+			"name": "Aorta",
+			"summary": "The body's main artery. Oxygen-rich blood leaves the left ventricle through it and is carried on to every organ.",
+			"fact": "The coronary arteries, which feed the heart muscle itself, branch off close to its base."
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "superior_vena_cava" ],
+			"caption": "Oxygen-poor blood comes back from the head, neck and arms through the superior vena cava."
+		},
+		{
+			"structures": [ "right_atrium" ],
+			"caption": "It arrives in the right atrium, the first chamber of the heart."
+		},
+		{
+			"structures": [ "right_ventricle" ],
+			"caption": "The right ventricle squeezes it on towards the lungs."
+		},
+		{
+			"structures": [ "pulmonary_trunk", "pulmonary_arteries" ],
+			"caption": "The pulmonary trunk splits into two pulmonary arteries, one for each lung, where the blood picks up oxygen."
+		},
+		{
+			"structures": [ "pulmonary_veins" ],
+			"caption": "Freshly oxygenated blood returns from the lungs through the pulmonary veins."
+		},
+		{
+			"structures": [ "left_atrium" ],
+			"caption": "It collects in the left atrium."
+		},
+		{
+			"structures": [ "left_ventricle" ],
+			"caption": "The left ventricle, the strongest chamber, pushes it out."
+		},
+		{
+			"structures": [ "ascending_aorta" ],
+			"caption": "The blood leaves through the aorta and is carried to every part of the body. Then the journey starts again."
+		}
+	]
+}

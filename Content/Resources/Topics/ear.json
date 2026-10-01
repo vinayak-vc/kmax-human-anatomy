@@ -1,0 +1,154 @@
+{
+	"id": "ear",
+	"title": "The Ear",
+	"subtitle": "It turns vibrations in the air into the sounds you hear",
+	"intro": "Point at any part of the ear to see what it does. Press Magnify to lift the tiny bones into view, or start the tour to follow a sound in. Motion is slowed and exaggerated.",
+	"behaviour": "hearing",
+	"displayScale": 2.6,
+	"popOut": 0.02,
+	"maxZoom": 1.8,
+	"homeYaw": -20,
+	"homePitch": 8,
+	"explodeLabel": "Magnify",
+	"assembleLabel": "Shrink back",
+	"structures": [
+		{
+			"id": "ear_pinna",
+			"name": "Pinna",
+			"summary": "The visible part of the ear. Its folds and ridges collect sound and funnel it into the ear canal.",
+			"fact": "Its folds bounce sound differently depending on its direction, which helps your brain tell where a sound came from.",
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_auditory_canal",
+			"name": "Ear canal",
+			"summary": "A tube about 2.5 cm long that carries sound from the pinna to the eardrum. Glands in its skin make earwax, which traps dust and keeps the canal clean.",
+			"fact": "Its length makes it resonate, boosting sounds in the range where speech is clearest.",
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_tympanic_membrane",
+			"name": "Eardrum",
+			"summary": "A thin, cone-shaped sheet of tissue, about as thin as paper, that closes the end of the ear canal. Sound waves make it vibrate.",
+			"fact": "For the quietest sounds you can hear, it moves by less than the width of an atom.",
+			"explodeMm": { "x": 0, "y": 15, "z": -15 },
+			"explodeScale": 7.5,
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_tympanum_cavity",
+			"name": "Middle ear",
+			"summary": "A tiny air-filled chamber behind the eardrum. It holds the three smallest bones in the body.",
+			"fact": "The bones can only vibrate freely while the chamber is full of air. In glue ear it fills with fluid, and hearing dulls.",
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_malleus",
+			"name": "Malleus",
+			"summary": "The hammer, the first of the three tiny bones. Its long handle is fixed to the eardrum, so it moves every time the drum does.",
+			"fact": "Malleus is Latin for hammer. The bone is only about 8 mm long.",
+			"explodeMm": { "x": 0, "y": 15, "z": -15 },
+			"explodeScale": 7.5
+		},
+		{
+			"id": "ear_incus",
+			"name": "Incus",
+			"summary": "The anvil, the middle bone. It passes the vibration from the hammer on to the stirrup, like a tiny lever.",
+			"fact": "The three bones are named after the tools they resemble: hammer, anvil and stirrup.",
+			"explodeMm": { "x": 0, "y": 15, "z": -15 },
+			"explodeScale": 7.5
+		},
+		{
+			"id": "ear_stapes",
+			"name": "Stapes",
+			"summary": "The stirrup, the last of the three bones and the smallest in the body, about 3 mm long. Its flat base presses on the cochlea like a piston.",
+			"fact": "The eardrum is much larger than the base of the stirrup, so the three bones together boost the pressure roughly twenty times.",
+			"explodeMm": { "x": 0, "y": 15, "z": -15 },
+			"explodeScale": 7.5
+		},
+		{
+			"id": "ear_cochlea",
+			"name": "Cochlea",
+			"summary": "A fluid-filled tube coiled like a snail shell. Waves in its fluid bend thousands of tiny hair cells, which turn movement into nerve signals.",
+			"fact": "The three loops above it are the semicircular canals, which sense head movement for balance.",
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_vestibulocochlear_nerve",
+			"name": "Vestibulocochlear nerve",
+			"summary": "Carries signals from the cochlea, for hearing, and from the balance organs to the brain.",
+			"fact": "The hearing part alone has about 30,000 nerve fibres.",
+			"recedesWhenExploded": true
+		},
+		{
+			"id": "ear_eustachian_tube",
+			"name": "Eustachian tube",
+			"summary": "A narrow channel from the middle ear to the back of the throat. It opens when you swallow or yawn, keeping the air pressure either side of the eardrum equal.",
+			"fact": "The pop you feel in your ears in a plane or a lift is this tube opening.",
+			"recedesWhenExploded": true
+		}
+	],
+	"tour": [
+		{
+			"structures": [ "ear_pinna" ],
+			"caption": "Sound is a vibration in the air. The pinna catches it and funnels it into the ear.",
+			"exploded": "together",
+			"setsView": true,
+			"yaw": -50,
+			"pitch": 12,
+			"zoom": 1
+		},
+		{
+			"structures": [ "ear_auditory_canal" ],
+			"caption": "The ear canal guides the sound inwards, and boosts the pitches we use in speech.",
+			"setsView": true,
+			"yaw": -30,
+			"pitch": 10,
+			"zoom": 1
+		},
+		{
+			"structures": [ "ear_tympanic_membrane" ],
+			"caption": "At the end of the canal, the sound waves hit the eardrum and make it vibrate. Here it is shown much larger than life.",
+			"exploded": "apart",
+			"setsView": true,
+			"yaw": -15,
+			"pitch": 8,
+			"zoom": 1
+		},
+		{
+			"structures": [ "ear_malleus" ],
+			"caption": "Behind the drum, the vibration passes to the first of three tiny bones, the hammer.",
+			"setsView": true,
+			"yaw": -8,
+			"pitch": 6,
+			"zoom": 1
+		},
+		{
+			"structures": [ "ear_incus" ],
+			"caption": "The hammer hands it to the anvil."
+		},
+		{
+			"structures": [ "ear_stapes" ],
+			"caption": "The anvil hands it to the stirrup, the smallest bone in the body. Together the bones make the vibration about twenty times stronger.",
+			"zoom": 1.6
+		},
+		{
+			"structures": [ "ear_cochlea" ],
+			"caption": "The stirrup pushes on the fluid in the cochlea. Waves in the fluid bend tiny hair cells, which turn the movement into electrical signals.",
+			"exploded": "together",
+			"setsView": true,
+			"yaw": 0,
+			"pitch": 10,
+			"zoom": 1.8
+		},
+		{
+			"structures": [ "ear_vestibulocochlear_nerve" ],
+			"caption": "The nerve carries the signals to the brain, which turns them into what you hear.",
+			"exploded": "together",
+			"setsView": true,
+			"yaw": -10,
+			"pitch": 8,
+			"zoom": 1
+		}
+	]
+}
