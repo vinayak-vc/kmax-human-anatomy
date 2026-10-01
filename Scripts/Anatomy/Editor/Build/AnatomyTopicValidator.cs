@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 
 using UnityEngine;
 
@@ -62,13 +62,16 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
                     continue;
                 }
 
-                if (!Mathf.Approximately(material.GetFloat("_Cull"), 0f)) {
+                bool isGhost = path.EndsWith("_ghost.mat") || (material.HasProperty("_Surface") && material.GetFloat("_Surface") > 0.5f);
+                float expectedCull = isGhost ? 2f : 0f;
+
+                if (!Mathf.Approximately(material.GetFloat("_Cull"), expectedCull)) {
                     found++;
                     if (fix) {
-                        material.SetFloat("_Cull", 0f);
+                        material.SetFloat("_Cull", expectedCull);
                         EditorUtility.SetDirty(material);
                     } else {
-                        Debug.LogWarning($"{LogPrefix}'{path}' culls one side of its surface. Run Kmax > Anatomy > Enforce Double-Sided Materials.");
+                        Debug.LogWarning($"{LogPrefix}'{path}' cull mode is {material.GetFloat("_Cull")}, expected {expectedCull}. Run Kmax > Anatomy > Enforce Double-Sided Materials.");
                     }
                 }
             }

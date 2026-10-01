@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using UnityEditor;
 
@@ -123,7 +123,13 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
 
         /// <summary>A point turns about the joint as far as its place lets it follow the jaw.</summary>
         private Vector3 Follow(Vector3 point) {
-            float low = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_biteLine + FollowBelow, _biteLine + FollowAbove, point.y));
+            // Points at or above the bite line belong to the maxilla and upper face; they must not swing back into the teeth.
+            if (point.y >= _biteLine) {
+                return Vector3.zero;
+            }
+
+            // Below the bite line, points smoothly follow the mandibular rotation.
+            float low = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_biteLine, _biteLine - 0.012f, point.y));
             float ahead = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_joint.z + BehindJoint, _joint.z - AheadOfJoint, point.z));
             return (_turn * (point - _joint) + _joint - point) * (low * ahead);
         }

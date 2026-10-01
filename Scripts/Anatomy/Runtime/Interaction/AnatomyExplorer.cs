@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ViitorCloud.KmaxAnatomy {
     /// <summary>
@@ -13,6 +13,7 @@ namespace ViitorCloud.KmaxAnatomy {
         private const int NoTour = -1;
 
         private readonly AnatomyTopicData _data;
+        private bool _magnifiedBySelection;
 
         public AnatomyExplorer(AnatomyTopicData data) {
             _data = data;
@@ -136,6 +137,7 @@ namespace ViitorCloud.KmaxAnatomy {
                 return;
             }
 
+            _magnifiedBySelection = false;
             IsExploded = !IsExploded;
             RaiseChanged();
         }
@@ -191,6 +193,7 @@ namespace ViitorCloud.KmaxAnatomy {
             HoveredId = null;
             SelectedId = null;
             TourIndex = NoTour;
+            _magnifiedBySelection = false;
             IsExploded = false;
             RaiseChanged();
         }
@@ -250,13 +253,28 @@ namespace ViitorCloud.KmaxAnatomy {
 
         /// <summary>Picking a structure that is too small to see at its true size explodes the view, which enlarges it.</summary>
         private void MagnifySelection() {
-            if (SelectedId == null || IsExploded || !CanExplode) {
+            if (!CanExplode) {
+                return;
+            }
+
+            if (SelectedId == null) {
+                if (_magnifiedBySelection) {
+                    IsExploded = false;
+                    _magnifiedBySelection = false;
+                }
                 return;
             }
 
             AnatomyStructureInfo info = _data.FindStructure(SelectedId);
-            if (info != null && info.Magnifies) {
-                IsExploded = true;
+            bool magnifies = info != null && info.Magnifies;
+            if (magnifies) {
+                if (!IsExploded) {
+                    IsExploded = true;
+                    _magnifiedBySelection = true;
+                }
+            } else if (_magnifiedBySelection) {
+                IsExploded = false;
+                _magnifiedBySelection = false;
             }
         }
 
@@ -267,6 +285,7 @@ namespace ViitorCloud.KmaxAnatomy {
                 return;
             }
 
+            _magnifiedBySelection = false;
             if (step.Explode == TourExplodeChange.Apart) {
                 IsExploded = CanExplode;
             } else if (step.Explode == TourExplodeChange.Together) {

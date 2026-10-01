@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using KmaxXR;
 
@@ -27,8 +27,10 @@ namespace ViitorCloud.KmaxAnatomy {
         private const float IdleLineAlpha = 0.4f;
         private const float HoverLineAlpha = 0.9f;
         private const float RecededLineAlpha = 0.14f;
+        private const int BezierSegments = 24;
 
         private static readonly Color LineColor = new Color(0.55f, 0.9f, 1f, 1f);
+        private readonly Vector3[] _curveBuffer = new Vector3[BezierSegments + 1];
 
         [SerializeField, Tooltip("Area of the interface the badges are placed in. Its middle is the middle of the screen.")]
         private RectTransform layer;
@@ -92,6 +94,7 @@ namespace ViitorCloud.KmaxAnatomy {
                 badges[i].Exited += OnBadgeExited;
                 badges[i].Clicked += OnBadgeClicked;
                 badges[i].Clear();
+                lines[i].positionCount = BezierSegments + 1;
                 lines[i].enabled = false;
             }
 
@@ -258,9 +261,30 @@ namespace ViitorCloud.KmaxAnatomy {
                 }
 
                 float x = _onRight[i] ? columnOffset : -columnOffset;
-                lines[i].SetPosition(0, layer.TransformPoint(new Vector3(x, _slotHeights[i], 0f)));
-                lines[i].SetPosition(1, _anchors[i]);
+                Vector3 p0 = layer.TransformPoint(new Vector3(x, _slotHeights[i], 0f));
+                Vector3 p3 = _anchors[i];
+                Vector3 inward = _onRight[i] ? -layer.right : layer.right;
+                float dist = Vector3.Distance(p0, p3);
+                float handleLength = Mathf.Clamp(dist * 0.45f, 0.015f, 0.18f);
+                Vector3 p1 = p0 + inward * handleLength;
+                Vector3 p2 = Vector3.Lerp(p1, p3, 0.65f);
+
+                for (int s = 0; s <= BezierSegments; s++) {
+                    float t = (float)s / BezierSegments;
+                    _curveBuffer[s] = EvaluateCubicBezier(p0, p1, p2, p3, t);
+                }
+
+                lines[i].SetPositions(_curveBuffer);
             }
+        }
+
+        private static Vector3 EvaluateCubicBezier(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t) {
+            float u = 1f - t;
+            float tt = t * t;
+            float uu = u * u;
+            float uuu = uu * u;
+            float ttt = tt * t;
+            return uuu * p0 + 3f * uu * t * p1 + 3f * u * tt * p2 + ttt * p3;
         }
 
         private static void StyleLine(LineRenderer line, HighlightState state) {

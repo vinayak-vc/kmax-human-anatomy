@@ -1,4 +1,4 @@
-﻿using KmaxXR;
+using KmaxXR;
 
 using TMPro;
 
@@ -58,6 +58,8 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
         private const float CaptionWidth = 1040f;
         private const float CaptionHeight = 124f;
         private const float CaptionBottom = 24f;
+        private const float StepRowWidth = 340f;
+        private const float StepRowBottomGap = 12f;
         private const float CaptionMainWidth = 640f;
         private const float CaptionFactWidth = 340f;
         private const float CaptionMargin = 20f;
@@ -264,6 +266,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             Image ring = CreateImage(hostRect, "Ring", ringSprite, MarkerRingSize);
             TextMeshProUGUI numberText = AnatomyUiStyle.CreateText(hostRect, "Number", MarkerFontSize, AnatomyUiStyle.Heading, FontStyles.Bold, TextAlignmentOptions.Center);
             AnatomyUiStyle.Anchor(numberText.rectTransform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            numberText.raycastTarget = false;
 
             AnatomyMarker marker = host.AddComponent<AnatomyMarker>();
             SerializedObject markerObject = new SerializedObject(marker);
@@ -302,7 +305,7 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             host.transform.SetParent(parent, false);
             LineRenderer line = host.AddComponent<LineRenderer>();
             line.sharedMaterial = material;
-            line.positionCount = 2;
+            line.positionCount = 25;
             line.useWorldSpace = true;
             line.alignment = LineAlignment.View;
             line.numCapVertices = 4;
@@ -377,16 +380,24 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             Button tour = CreateButton(columnRect, "Tour", "Start tour", ButtonFontSize, 0f, out tourSlot, out tourLabel);
             Button explode = CreateButton(columnRect, "Explode", "Explode", ButtonFontSize, 0f, out explodeSlot, out explodeLabel);
 
-            RectTransform stepRow = CreateRow(columnRect, "StepRow", true);
+            // Previous and Next sit centered low on the screen, directly above the caption bar, so stepping through
+            // structures is grouped with the caption readout.
+            RectTransform stepRow = CreateRow(parent, "StepRow", true);
+            AnatomyUiStyle.Anchor(stepRow, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, CaptionBottom + CaptionHeight + StepRowBottomGap), new Vector2(StepRowWidth, ButtonHeight));
             Button previous = CreateButton(stepRow, "Previous", "Previous", ButtonFontSize, 0f, out previousSlot, out previousLabel);
             Button next = CreateButton(stepRow, "Next", "Next", ButtonFontSize, 0f, out nextSlot, out nextLabel);
+            previousSlot.GetComponent<LayoutElement>().flexibleWidth = 1f;
+            nextSlot.GetComponent<LayoutElement>().flexibleWidth = 1f;
 
+            // Zoom is driven directly via the stylus (push/pull dolly) and mouse wheel, so the on-screen scale buttons are hidden.
             RectTransform zoomRow = CreateRow(columnRect, "ZoomRow", false);
             Button zoomOut = CreateButton(zoomRow, "ZoomOut", "-", SymbolFontSize, ZoomButtonWidth, out zoomOutSlot, out zoomOutLabel);
             TextMeshProUGUI zoomText = AnatomyUiStyle.CreateText(zoomRow, "ZoomReadout", ButtonFontSize, AnatomyUiStyle.AccentBright, FontStyles.Bold, TextAlignmentOptions.Center);
             zoomText.text = "1.0x";
             zoomText.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
             Button zoomIn = CreateButton(zoomRow, "ZoomIn", "+", SymbolFontSize, ZoomButtonWidth, out zoomInSlot, out zoomInLabel);
+            zoomRow.gameObject.SetActive(false);
 
             Button reset = CreateButton(columnRect, "Reset", "Reset view", ButtonFontSize, 0f, out resetSlot, out resetLabel);
 

@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 
 using UnityEngine;
 
@@ -92,8 +92,8 @@ namespace ViitorCloud.KmaxAnatomy {
             factText.gameObject.SetActive(!string.IsNullOrEmpty(fact));
             stepText.gameObject.SetActive(!string.IsNullOrEmpty(step));
 
-            _fade = 0f;
-            captionGroup.alpha = 0f;
+            _fade = captionGroup.alpha > 0.5f ? 0.45f : 0f;
+            captionGroup.alpha = _fade;
             enabled = true;
         }
     }

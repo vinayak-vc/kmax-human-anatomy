@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -48,9 +48,8 @@ namespace ViitorCloud.KmaxAnatomy {
 
         /// <summary>The muscles that are stretched as the jaw opens.</summary>
         public static readonly string[] SoftIds = new string[] {
-            "buccinator_muscle", "orbicularis_muscle", "depressor_labii_inferioris_musc", "levatator_labii_superioris_alae",
-            "levatator_anguli_oris_muscle", "levatator_labii_superioris_musc", "zygomaticus_major_muscle",
-            "zygomaticus_minor_muscle", "depressor_anguli_oris_muscle", "mentalis_muscle", MasseterId, "risorius_muscle",
+            "buccinator_muscle", "orbicularis_muscle", "depressor_labii_inferioris_musc",
+            "depressor_anguli_oris_muscle", "mentalis_muscle", MasseterId, "risorius_muscle",
             LateralPterygoidId, MedialPterygoidId, MylohyoidId, DigastricId, GeniohyoidId, "stylohyoid_muscle",
             "hyoglossus_muscle"
         };

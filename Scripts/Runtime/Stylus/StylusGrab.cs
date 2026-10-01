@@ -66,6 +66,8 @@ namespace ViitorCloud.KmaxDisplay {
         private Grabbable _held;
         private Vector3 _holdLocalPoint;
         private Quaternion _holdLocalRotation = Quaternion.identity;
+        private float _mouseGrabDistance = 0.5f;
+        private Vector3 _mouseGrabOffset = Vector3.zero;
 
         /// <summary>The object currently held, or null.</summary>
         public Grabbable Held {
@@ -131,7 +133,26 @@ namespace ViitorCloud.KmaxDisplay {
         /// </summary>
         private void DriveKinematic() {
             Transform held = _held.transform;
-            Vector3 target = tip.Position - held.rotation * _holdLocalPoint;
+            Vector3 target;
+            KmaxStylus pen = Resolve();
+            bool isPenActive = pen != null && pen.Visible;
+
+            if (!isPenActive && mouseFallback) {
+                Camera cam = StereoVolume.IsReady ? StereoVolume.CenterCamera : Camera.main;
+                if (cam != null) {
+                    float scroll = Input.mouseScrollDelta.y;
+                    if (Mathf.Abs(scroll) > Mathf.Epsilon) {
+                        _mouseGrabDistance = Mathf.Clamp(_mouseGrabDistance + scroll * 0.05f, 0.1f, 5f);
+                    }
+                    Ray mouseRay = cam.ScreenPointToRay(Input.mousePosition);
+                    target = mouseRay.GetPoint(_mouseGrabDistance) + _mouseGrabOffset;
+                } else {
+                    target = tip.Position - held.rotation * _holdLocalPoint;
+                }
+            } else {
+                target = tip.Position - held.rotation * _holdLocalPoint;
+            }
+
             if (_held.ClampToComfortVolume) {
                 target = StereoVolume.ClampToComfort(target);
             }
@@ -219,8 +240,32 @@ namespace ViitorCloud.KmaxDisplay {
         }
 
         private Grabbable FindCandidate() {
+            KmaxStylus pen = Resolve();
+            bool isPenActive = pen != null && pen.Visible;
+
+            if (!isPenActive && mouseFallback) {
+                Camera cam = StereoVolume.IsReady ? StereoVolume.CenterCamera : Camera.main;
+                if (cam != null) {
+                    Ray mouseRay = cam.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit[] hits = Physics.RaycastAll(mouseRay, 10f);
+                    Grabbable mouseCandidate = null;
+                    float bestDist = float.MaxValue;
+                    for (int i = 0; i < hits.Length; i++) {
+                        Grabbable g = hits[i].collider.GetComponentInParent<Grabbable>();
+                        if (g != null && !g.IsHeld && g.isActiveAndEnabled && hits[i].distance < bestDist) {
+                            bestDist = hits[i].distance;
+                            mouseCandidate = g;
+                            _mouseGrabDistance = hits[i].distance;
+                            _mouseGrabOffset = g.transform.position - hits[i].point;
+                        }
+                    }
+                    if (mouseCandidate != null) {
+                        return mouseCandidate;
+                    }
+                }
+            }
+
             if (selection == SelectionMode.Ray) {
-                KmaxStylus pen = Resolve();
                 if (pen == null || pen.CurrentHitObject == null) {
                     return null;
                 }

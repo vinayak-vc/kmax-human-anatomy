@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using TMPro;
@@ -75,11 +75,21 @@ namespace ViitorCloud.KmaxAnatomy {
 
         private UnityAction[] _linkHandlers = new UnityAction[0];
 
+        private void Awake() {
+            if (zoomRow != null) {
+                zoomRow.SetActive(false);
+            }
+        }
+
         private void OnEnable() {
             if (!IsFullyWired()) {
                 Debug.LogError($"{nameof(AnatomyControls)} on '{name}' is missing a button, slot or label; the controls are disabled.", this);
                 enabled = false;
                 return;
+            }
+
+            if (zoomRow != null) {
+                zoomRow.SetActive(false);
             }
 
             exploreButton.onClick.AddListener(OnExploreClicked);
@@ -125,12 +135,12 @@ namespace ViitorCloud.KmaxAnatomy {
         }
 
         /// <summary>
-        /// Previous and Next, and the zoom, are only there for a topic that has something to step through and can be zoomed. A
-        /// topic that works in the room's space has neither.
+        /// Previous and Next are only there for a topic that has something to step through. Zoom is driven directly via the
+        /// stylus and mouse wheel, so the on-screen zoom row is kept hidden.
         /// </summary>
         public void ShowNavigation(bool showSteps, bool showZoom) {
             stepRow.SetActive(showSteps);
-            zoomRow.SetActive(showZoom);
+            zoomRow.SetActive(false);
         }
 
         /// <summary>Shows a button for each link a topic offers, with its wording, and hides the rest of the pool.</summary>

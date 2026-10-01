@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -82,6 +82,7 @@ namespace ViitorCloud.KmaxAnatomy {
         private float _frontDepth;
         private float _backDepth;
         private float _scale = 1f;
+        private float _mouseScanFraction = 0.35f;
         private bool _slicing;
         private Say _spoken = Say.Outside;
         private string _spokenOrgan;
@@ -161,13 +162,46 @@ namespace ViitorCloud.KmaxAnatomy {
         }
 
         private void Update() {
-            if (_tip == null || !StereoVolume.IsReady) {
+            if (!StereoVolume.IsReady) {
                 SwitchOff();
                 return;
             }
 
-            Vector3 point = _tip.Position;
+            Vector3 point;
             Transform screen = StereoVolume.ScreenTransform;
+            if (_tip != null && _tip.IsTracked) {
+                point = _tip.Position;
+            } else {
+                float scroll = Input.mouseScrollDelta.y;
+                if (Mathf.Abs(scroll) > Mathf.Epsilon) {
+                    _mouseScanFraction = Mathf.Clamp01(_mouseScanFraction + scroll * 0.05f);
+                }
+
+                float targetDepth = Mathf.Lerp(_frontDepth + 0.02f, _backDepth, _mouseScanFraction);
+                Camera cam = StereoVolume.CenterCamera != null ? StereoVolume.CenterCamera : Camera.main;
+                if (cam == null) {
+                    SwitchOff();
+                    return;
+                }
+
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+                Vector3 planePoint = screen.TransformPoint(new Vector3(0f, 0f, targetDepth));
+                Vector3 planeNormal = screen.forward;
+                float denom = Vector3.Dot(ray.direction, planeNormal);
+                if (Mathf.Abs(denom) < 1e-6f) {
+                    SwitchOff();
+                    return;
+                }
+
+                float dist = Vector3.Dot(planePoint - ray.origin, planeNormal) / denom;
+                if (dist <= 0f) {
+                    SwitchOff();
+                    return;
+                }
+
+                point = ray.GetPoint(dist);
+            }
+
             float radius = _slicing ? sliceRadius : lensRadius;
             PushLens(point, screen.forward, radius);
             if (!_slicing) {

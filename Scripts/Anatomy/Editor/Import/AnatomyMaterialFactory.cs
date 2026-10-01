@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 
 using UnityEngine;
 
@@ -62,9 +62,9 @@ namespace ViitorCloud.KmaxAnatomy.Editor {
             material.SetColor("_EmissionColor", Color.black);
             material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
 
-            // Both faces are drawn: several DOSCH structures are open shells, such as the left atrium, and
-            // seen into from outside their far wall would otherwise vanish.
-            material.SetFloat("_Cull", 0f);
+            // Transparent materials cull backfaces so interior backfaces don't sort over frontfaces
+            // and create dark triangular patch artifacts. Opaque shells can remain double-sided.
+            material.SetFloat("_Cull", transparent ? 2f : 0f);
 
             // A ghost fades its highlights along with the rest of it. Left at the default, the specular is kept at
             // full strength however transparent the surface is, and the glass turns milky.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using KmaxXR;
@@ -251,6 +251,10 @@ namespace ViitorCloud.KmaxAnatomy {
                     PassWave();
                     break;
             }
+
+            if ((_tip == null || !_tip.IsTracked) && _held == null) {
+                UpdateMouseHover();
+            }
         }
 
         private void EnterPhase(Phase phase) {
@@ -473,6 +477,29 @@ namespace ViitorCloud.KmaxAnatomy {
             piece.SetTouchGlow(0f);
             if (_touched == piece) {
                 _touched = null;
+            }
+        }
+
+        private void UpdateMouseHover() {
+            Camera cam = StereoVolume.IsReady ? StereoVolume.CenterCamera : Camera.main;
+            if (cam == null) {
+                return;
+            }
+
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            OrganPiece pieceUnderMouse = null;
+            if (Physics.Raycast(ray, out RaycastHit hit, 10f)) {
+                pieceUnderMouse = hit.collider.GetComponentInParent<OrganPiece>();
+            }
+
+            if (pieceUnderMouse != _touched) {
+                if (_touched != null) {
+                    _touched.SetTouchGlow(0f);
+                }
+                _touched = pieceUnderMouse;
+                if (_touched != null) {
+                    _touched.SetTouchGlow(TouchGlow);
+                }
             }
         }
 

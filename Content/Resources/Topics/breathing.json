@@ -77,7 +77,6 @@
 			"name": "Breastbone",
 			"summary": "The flat bone at the front of the chest. It moves up and forward a little with each breath.",
 			"fact": "In CPR the chest is pressed here, to squeeze the heart against the spine.",
-			"opacity": 0.55,
 			"recededSolidity": 0.35,
 			"recededGlow": 0.25
 		},

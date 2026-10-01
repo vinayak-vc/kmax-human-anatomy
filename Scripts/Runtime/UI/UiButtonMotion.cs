@@ -33,7 +33,7 @@ namespace ViitorCloud.KmaxDisplay {
         private float springFrequency = 18f;
         [SerializeField, Range(0.2f, 1.5f), Tooltip("Damping ratio. Below one the button overshoots a little and settles, which " +
             "is the bounce; one or more settles without overshoot.")]
-        private float springDamping = 0.7f;
+        private float springDamping = 1.05f;
 
         [Header("Depth")]
         [SerializeField, Tooltip("How far the button sinks into the screen while pressed, in millimetres of the world. " +
@@ -158,6 +158,12 @@ namespace ViitorCloud.KmaxDisplay {
             }
 
             UiSpring.Step(ref _currentScale, ref _scaleVelocity, targetScale, springFrequency, springDamping, dt);
+            if (!pressed && !hovered && _currentScale < 1f) {
+                _currentScale = 1f;
+                _scaleVelocity = 0f;
+            } else if (hovered && _currentScale < 1f) {
+                _currentScale = 1f;
+            }
             _rectTransform.localScale = _restScale * _currentScale;
 
             // The lift eases out under the press, so pressing pushes the button back down again.

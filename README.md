@@ -1,59 +1,94 @@
-# kmax-human-anatomy
+# FMAX Human Anatomy
 
-A human anatomy exhibit for the **Kmax** head-tracked stereo display with a 6-DOF stylus.
+![FMAX Human Anatomy Banner](Images/Logo/Logo_Banner.png)
 
-The module holds the Kmax SDKs, a domain-neutral display framework ported from `kmax-display-example`, and the
-exhibit built on it. `Scene/Main.unity` opens on a **launcher**: nine cards (the body map, the **heart**, **brain**, **ear**, **eye**,
-**breathing**, **skull and face** and the two activities) with the chosen exhibit's own model turning in front of the glass above them.
-Pressing a card chooses it; pressing it again, or Load, opens it behind a fade, and a Menu button leads back (Next exhibit goes on round).
-Left alone, a topic returns to the launcher and the launcher shows itself, card by card. The **body map** is a glowing bust with layers to
-show and hide and six places to explore. The activities are **put the organs back** (carry each organ home with the pen) and **scan the
-body** (the pen's tip cuts into the torso). The whole interface is dark glass at half size, with spring buttons, music and button sounds.
-In the Editor, F1 to F9 switch between the topics, the body map and the activities, and F10 goes to the launcher.
+An interactive, spatial 3D human anatomy kiosk and explorer designed for the **FMAX** head-tracked stereoscopic display with 6-DOF stylus interaction and desktop/mouse fallback.
 
-## Layout
+---
+
+## Overview
+
+**FMAX Human Anatomy** delivers a real-time, co-located 3D anatomical experience. Built on Unity 6000 with a custom domain-neutral display framework, it offers full-fidelity anatomical exploration, guided tours, exploded views, layer peeling, and interactive hands-on medical activities.
+
+### Core Highlights
+
+- **Kiosk Launcher**: 9 exhibit cards (Body Map, Heart, Brain, Ear, Eye, Breathing, Skull & Face, plus two hands-on activities) with live 3D models floating and turning in front of the glass. Automatically cycles exhibits when idle.
+- **Body Map**: Glowing anatomical bust with peelable organ/muscle/skeletal layers and 6 deep-dive entry points.
+- **Deep Exhibits**:
+  - **Heart**: Anatomical chambers, great vessels, and coronary circulation.
+  - **Brain**: Cortical lobes, cerebellum, brainstem, and cranial structures.
+  - **Ear**: Outer, middle, and inner ear structures with dedicated Incus/ossicle magnification.
+  - **Eye**: Cornea, lens, retina, optical nerve, and extraocular muscles.
+  - **Breathing**: Respiratory tract, bronchial tree, lungs, and thoracic cage.
+  - **Skull & Face**: Cranial bones and jaw articulation with collision-calibrated facial kinematics.
+- **Interactive Activities**:
+  - **Put the Organs Back**: Pick, carry, and place anatomical organs into correct anatomical positions using the 6-DOF stylus or mouse drag with depth scroll.
+  - **Scan the Body**: Interactive cross-sectional slicing through the coronal torso with depth-calibrated cutaway planes.
+
+---
+
+## Controls & Interaction
+
+### 6-DOF Stylus Controls
+- **Primary Button (Button 0)**: Tap to select/pick structures; hold and move to orbit the 3D model.
+- **Secondary Button (Button 1)**: Tap to reset view and center the model.
+- **Center Button (Button 2)**: Hold and push forward or pull back to dolly in/out (zoom).
+
+### Desktop / Editor Controls
+- **Mouse Left Click**: Pick and select structures / press UI buttons.
+- **Mouse Left Drag**: Orbit the model around the focus point.
+- **Mouse Scroll Wheel / <kbd>W</kbd> & <kbd>S</kbd>**: Zoom in and out.
+- **Keyboard Shortcuts**:
+  - <kbd>F1</kbd> to <kbd>F9</kbd>: Instantly jump between topics and activities.
+  - <kbd>F10</kbd>: Return to launcher.
+  - <kbd>R</kbd>: Reset view.
+
+---
+
+## User Interface & Aesthetic
+
+The UI is built with a dark slate glass theme (`#0F172A`) featuring:
+- **Center Bottom Navigation**: Previous and Next structure buttons centered directly above the caption card for natural sequential reading.
+- **Dynamic Leader Lines**: 25-point smooth cubic Bezier lines connecting numbered pin badges to 3D anatomical points.
+- **Spring Physics**: Damped spring motion (`UiButtonMotion`) on buttons and pins for tactile hover and click feedback.
+- **Double-Sided Rendering**: Correct back-face rendering and balanced ghost opacity for overlapping translucent structures.
+
+---
+
+## Project Layout
 
 ```
-Plugins/Kmax/       Kmax SDKs — vendor code, unmodified
-  com.kmax.xr.core/   XR Core 2.5.2  (default backend)
-  com.kmax.xr.aio/    AIO K1 1.2.0   (behind KMAX_AIO_K1)
-Scripts/Runtime/    KmaxDisplay        — comfort, stylus, view, rendering, UI, audio
-Scripts/Editor/     KmaxDisplay.Editor — scene building, comfort audit, backend switch
-Scripts/Anatomy/    KmaxAnatomy        — DOSCH import pipeline and the anatomy exhibit
-Source~/            DOSCH pack — git-ignored, and ignored by Unity because of the tilde
-Generated/          Everything generated from it — git-ignored
-docs/               how to use it, and why it is shaped this way
+Images/Logo/        Brand identity assets (FMAX Master, Icon, Banner, and transparent variants)
+Plugins/Kmax/       FMAX / Kmax SDKs — vendor libraries
+  com.kmax.xr.core/   XR Core 2.5.2 (default backend)
+  com.kmax.xr.aio/    AIO K1 1.2.0 (behind KMAX_AIO_K1 define)
+Scripts/Runtime/    Display framework — comfort volume, stylus tracking, viewer, rendering, UI, audio
+Scripts/Editor/     Editor tooling — scene building, comfort audit, SDK backend switcher
+Scripts/Anatomy/    Anatomy engine — DOSCH asset pipeline, topic library, behaviors, and presentation
+Scene/              Main.unity — the single persistent scene containing the full kiosk runtime
+Source~/            Source geometry pack (git-ignored)
+Generated/          Generated runtime prefabs, meshes, and materials (git-ignored)
+docs/               Architecture, design decisions, comfort guides, and API documentation
 ```
 
-## Quick start
+---
+
+## Quick Start
 
 1. Open the project in **Unity 6000.3.9f1**.
-2. Check **Kmax → SDK Backend → XR Core 2.5.2** is selected.
-3. Read **[docs/kmax-usage-guide.md](docs/kmax-usage-guide.md)** before writing scene code.
-4. Build a scene from `KmaxRigBuilder` rather than authoring one by hand.
-5. Run **Kmax → Audit Comfort Volume** after every scene change.
-6. Place the DOSCH pack in `Source~/` and run **Kmax → Anatomy → Import → All Topics**, which also renders the launcher's card pictures.
-   Models and pictures are never committed; a fresh clone has none until this is done. Then **Kmax → Anatomy → Build → Kiosk Scene**.
+2. Verify SDK backend: **Kmax → SDK Backend → XR Core 2.5.2**.
+3. Place source assets in `Source~/` and run **Kmax → Anatomy → Import → All Topics**.
+4. Build the runtime scene: **Kmax → Anatomy → Build → Kiosk Scene**.
+5. Open and run `Scene/Main.unity`.
 
-## The three things that matter most
+---
 
-- **Never hardcode the depth budget.** Read it from `StereoVolume`; it tracks `ViewScale` at
-  runtime.
-- **Measure `StylusTip.tipOffset` on the hardware.** It defaults to zero, which is wrong, and every
-  co-located interaction is only as accurate as that number.
-- **Verify on the display, not in the Game view.** A scene that looks fine on a 2D monitor can be
-  unusable through the glasses.
+## Documentation
 
-## Docs
-
-| File | What it covers |
-|---|---|
-| [project-overview.md](docs/project-overview.md) | What exists, what does not, where to start |
-| [kmax-usage-guide.md](docs/kmax-usage-guide.md) | **How to use the framework.** Read first. |
-| [architecture.md](docs/architecture.md) | Assemblies, types, and the reasons behind their shape |
-| [decisions.md](docs/decisions.md) | Decisions already made, with their reasons |
-| [roadmap.md](docs/roadmap.md) | Phases from here to a shippable exhibit |
-| [tasks.md](docs/tasks.md) | Done, next, blocked |
-| [ai_handoff.md](docs/ai_handoff.md) | Current state and the next recommended task |
-
-Coding conventions are set by `AGENTS.md` at the project root and `.editorconfig`.
+For technical details, see the [`docs/`](docs/) directory:
+- [project-overview.md](docs/project-overview.md) — System boundaries and component map
+- [kmax-usage-guide.md](docs/kmax-usage-guide.md) — Display framework and comfort guide
+- [architecture.md](docs/architecture.md) — Assembly structure, data flows, and design rationale
+- [decisions.md](docs/decisions.md) — Architecture decisions and trade-offs
+- [tasks.md](docs/tasks.md) — Roadmap and completed features
+- [ai_handoff.md](docs/ai_handoff.md) — Technical state and maintenance notes

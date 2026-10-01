@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace ViitorCloud.KmaxAnatomy {
     /// <summary>
@@ -29,11 +29,11 @@ namespace ViitorCloud.KmaxAnatomy {
         [SerializeField, Tooltip("Seconds an emphasis change takes to settle.")]
         private float blendTime = 0.2f;
         [SerializeField, Range(0f, 1f), Tooltip("How solid a structure is while it has receded. Lower is more see-through.")]
-        private float ghostOpacity = 0.1f;
+        private float ghostOpacity = 0.08f;
         [SerializeField, Range(0f, 1f), Tooltip("How solid a receded structure is while the pointer is on it.")]
         private float previewOpacity = 0.45f;
         [SerializeField, Range(0f, 1f), Tooltip("Strength of the glowing outline on a structure that has receded.")]
-        private float rimStrength = 0.85f;
+        private float rimStrength = 0.22f;
 
         private Renderer _renderer;
         private MaterialPropertyBlock _bodyBlock;
@@ -166,12 +166,12 @@ namespace ViitorCloud.KmaxAnatomy {
             bool canGhost = _glassMaterials != null;
             switch (state) {
                 case HighlightState.Hovered:
-                    return SolidEmphasis(1.12f, 0.28f, 1.03f, 0.35f);
+                    return SolidEmphasis(1.15f, 0.35f, 1f, 1f);
                 case HighlightState.Focused:
-                    return SolidEmphasis(1.18f, 0.5f, 1.05f, 0.65f);
+                    return SolidEmphasis(1.22f, 0.5f, 1.05f, 1f);
                 case HighlightState.Dimmed:
                     return canGhost
-                        ? new Emphasis(1f, 0f, 1f, ghostOpacity * _recededSolidity, rimStrength * _recededGlow)
+                        ? new Emphasis(0.65f, 0f, 1f, ghostOpacity * _recededSolidity, rimStrength * _recededGlow)
                         : new Emphasis(DarkenedBrightness, 0f, 1f, FullOpacity, 0f);
                 case HighlightState.Previewed:
                     return canGhost

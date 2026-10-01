@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using KmaxXR;
@@ -59,6 +60,8 @@ namespace ViitorCloud.KmaxAnatomy {
         private ITopicAction _action;
         private ITopicNarrator _narrator;
         private int _shownTourIndex = -1;
+        private Coroutine _unhoverRoutine;
+        private string _pendingUnhoverId;
 
         /// <summary>Raised with a topic's id when the visitor chooses to explore what is picked.</summary>
         public event Action<string> TopicRequested;
@@ -359,7 +362,13 @@ namespace ViitorCloud.KmaxAnatomy {
         }
 
         private void HoverStructure(string structureId) {
-            if (_explorer == null) {
+            if (_unhoverRoutine != null) {
+                StopCoroutine(_unhoverRoutine);
+                _unhoverRoutine = null;
+                _pendingUnhoverId = null;
+            }
+
+            if (_explorer == null || _explorer.HoveredId == structureId) {
                 return;
             }
 
@@ -374,9 +383,24 @@ namespace ViitorCloud.KmaxAnatomy {
         }
 
         private void UnhoverStructure(string structureId) {
-            if (_explorer != null) {
-                _explorer.Unhover(structureId);
+            if (_explorer == null || _explorer.HoveredId != structureId) {
+                return;
             }
+
+            _pendingUnhoverId = structureId;
+            if (_unhoverRoutine != null) {
+                StopCoroutine(_unhoverRoutine);
+            }
+            _unhoverRoutine = StartCoroutine(DeferredUnhoverRoutine());
+        }
+
+        private IEnumerator DeferredUnhoverRoutine() {
+            yield return null;
+            if (_pendingUnhoverId != null && _explorer != null && _explorer.HoveredId == _pendingUnhoverId) {
+                _explorer.Unhover(_pendingUnhoverId);
+            }
+            _pendingUnhoverId = null;
+            _unhoverRoutine = null;
         }
 
         /// <summary>
